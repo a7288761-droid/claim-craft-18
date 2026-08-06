@@ -78,20 +78,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EasyClaim — Understand your rights, prepare your claim" },
+      { title: "EasyClaim — Know your rights, draft your claim" },
       {
         name: "description",
         content:
-          "EasyClaim analyses your policies, contracts and receipts and drafts claim or appeal letters.",
+          "Upload insurance policies, contracts, receipts or tickets and get a clear analysis plus a ready-to-send appeal letter draft.",
       },
       { name: "author", content: "EasyClaim" },
-      { property: "og:title", content: "EasyClaim" },
+      { property: "og:title", content: "EasyClaim — Know your rights, draft your claim" },
       {
         property: "og:description",
-        content: "AI-assisted document analysis and claim letter drafting.",
+        content: "Upload insurance policies, contracts, receipts or tickets and get a clear analysis plus a ready-to-send appeal letter draft.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "EasyClaim — Know your rights, draft your claim" },
+      { name: "twitter:description", content: "Upload insurance policies, contracts, receipts or tickets and get a clear analysis plus a ready-to-send appeal letter draft." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0431819a-7849-4533-a522-e982cb4cd867/id-preview-bda3976e--546105e6-51f0-4e5d-bbbc-502e5808d6e7.lovable.app-1786025696605.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0431819a-7849-4533-a522-e982cb4cd867/id-preview-bda3976e--546105e6-51f0-4e5d-bbbc-502e5808d6e7.lovable.app-1786025696605.png" },
     ],
     links: [
       {

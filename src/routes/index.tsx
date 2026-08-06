@@ -16,7 +16,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "EasyClaim — Know your rights, draft your claim" },
       {
         property: "og:description",
-        content: "AI-assisted document analysis and claim letter drafting for everyday disputes.",
+        content: "Upload insurance policies, contracts, receipts or tickets and get a clear analysis plus a ready-to-send appeal letter draft.",
       },
     ],
   }),
