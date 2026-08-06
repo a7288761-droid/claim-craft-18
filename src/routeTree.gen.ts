@@ -17,6 +17,8 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedAnalysisClaimIdRouteImport } from './routes/_authenticated/analysis.$claimId'
 import { Route as AuthenticatedLetterClaimIdRouteImport } from './routes/_authenticated/letter.$claimId'
 import { Route as AuthenticatedWorkspaceCategoryRouteImport } from './routes/_authenticated/workspace.$category'
@@ -61,6 +63,16 @@ const AuthenticatedNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAnalysisClaimIdRoute =
   AuthenticatedAnalysisClaimIdRouteImport.update({
     id: '/analysis/$claimId',
@@ -88,6 +100,8 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/analysis/$claimId': typeof AuthenticatedAnalysisClaimIdRoute
   '/letter/$claimId': typeof AuthenticatedLetterClaimIdRoute
   '/workspace/$category': typeof AuthenticatedWorkspaceCategoryRoute
@@ -100,6 +114,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/analysis/$claimId': typeof AuthenticatedAnalysisClaimIdRoute
   '/letter/$claimId': typeof AuthenticatedLetterClaimIdRoute
   '/workspace/$category': typeof AuthenticatedWorkspaceCategoryRoute
@@ -114,6 +130,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/analysis/$claimId': typeof AuthenticatedAnalysisClaimIdRoute
   '/_authenticated/letter/$claimId': typeof AuthenticatedLetterClaimIdRoute
   '/_authenticated/workspace/$category': typeof AuthenticatedWorkspaceCategoryRoute
@@ -128,6 +146,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/notifications'
+    | '/profile'
+    | '/settings'
     | '/analysis/$claimId'
     | '/letter/$claimId'
     | '/workspace/$category'
@@ -140,6 +160,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/notifications'
+    | '/profile'
+    | '/settings'
     | '/analysis/$claimId'
     | '/letter/$claimId'
     | '/workspace/$category'
@@ -153,6 +175,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/history'
     | '/_authenticated/notifications'
+    | '/_authenticated/profile'
+    | '/_authenticated/settings'
     | '/_authenticated/analysis/$claimId'
     | '/_authenticated/letter/$claimId'
     | '/_authenticated/workspace/$category'
@@ -224,6 +248,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/analysis/$claimId': {
       id: '/_authenticated/analysis/$claimId'
       path: '/analysis/$claimId'
@@ -252,6 +290,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedAnalysisClaimIdRoute: typeof AuthenticatedAnalysisClaimIdRoute
   AuthenticatedLetterClaimIdRoute: typeof AuthenticatedLetterClaimIdRoute
   AuthenticatedWorkspaceCategoryRoute: typeof AuthenticatedWorkspaceCategoryRoute
@@ -261,6 +301,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedAnalysisClaimIdRoute: AuthenticatedAnalysisClaimIdRoute,
   AuthenticatedLetterClaimIdRoute: AuthenticatedLetterClaimIdRoute,
   AuthenticatedWorkspaceCategoryRoute: AuthenticatedWorkspaceCategoryRoute,
