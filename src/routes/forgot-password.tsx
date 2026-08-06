@@ -31,14 +31,14 @@ function ForgotPasswordPage() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const email = z.string().trim().email().max(255).safeParse(form.get("email"));
-    if (!email.success) return toast.error("Enter a valid email address");
+    if (!email.success) { toast.error("Enter a valid email address"); return; }
 
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email.data, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setSent(true);
   }
 

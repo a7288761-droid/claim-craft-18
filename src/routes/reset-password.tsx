@@ -29,13 +29,13 @@ function ResetPasswordPage() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const password = z.string().min(8).max(72).safeParse(form.get("password"));
-    if (!password.success) return toast.error("Password must be at least 8 characters");
-    if (password.data !== form.get("confirm")) return toast.error("Passwords do not match");
+    if (!password.success) { toast.error("Password must be at least 8 characters"); return; }
+    if (password.data !== form.get("confirm")) { toast.error("Passwords do not match"); return; }
 
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password: password.data });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Password updated");
     navigate({ to: "/dashboard" });
   }

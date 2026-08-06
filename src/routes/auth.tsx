@@ -43,8 +43,8 @@ function AuthPage() {
     const form = new FormData(event.currentTarget);
     const email = emailSchema.safeParse(form.get("email"));
     const password = passwordSchema.safeParse(form.get("password"));
-    if (!email.success) return toast.error(email.error.issues[0]!.message);
-    if (!password.success) return toast.error(password.error.issues[0]!.message);
+    if (!email.success) { toast.error(email.error.issues[0]!.message); return; }
+    if (!password.success) { toast.error(password.error.issues[0]!.message); return; }
 
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
@@ -52,7 +52,7 @@ function AuthPage() {
       password: password.data,
     });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     navigate({ to: "/dashboard" });
   }
 
@@ -62,9 +62,9 @@ function AuthPage() {
     const name = nameSchema.safeParse(form.get("name"));
     const email = emailSchema.safeParse(form.get("email"));
     const password = passwordSchema.safeParse(form.get("password"));
-    if (!name.success) return toast.error(name.error.issues[0]!.message);
-    if (!email.success) return toast.error(email.error.issues[0]!.message);
-    if (!password.success) return toast.error(password.error.issues[0]!.message);
+    if (!name.success) { toast.error(name.error.issues[0]!.message); return; }
+    if (!email.success) { toast.error(email.error.issues[0]!.message); return; }
+    if (!password.success) { toast.error(password.error.issues[0]!.message); return; }
 
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
@@ -76,7 +76,7 @@ function AuthPage() {
       },
     });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     if (!data.session) {
       setPendingConfirm(true);
       return;
@@ -91,7 +91,7 @@ function AuthPage() {
     });
     if (result.error) {
       setLoading(false);
-      return toast.error("Google sign-in failed. Please try again.");
+      { toast.error("Google sign-in failed. Please try again."); return; }
     }
     if (result.redirected) return;
     navigate({ to: "/dashboard" });
