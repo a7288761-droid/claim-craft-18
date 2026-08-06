@@ -15,7 +15,10 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedAnalysisClaimIdRouteImport } from './routes/_authenticated/analysis.$claimId'
+import { Route as AuthenticatedLetterClaimIdRouteImport } from './routes/_authenticated/letter.$claimId'
 import { Route as AuthenticatedWorkspaceCategoryRouteImport } from './routes/_authenticated/workspace.$category'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,10 +50,27 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAnalysisClaimIdRoute =
   AuthenticatedAnalysisClaimIdRouteImport.update({
     id: '/analysis/$claimId',
     path: '/analysis/$claimId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLetterClaimIdRoute =
+  AuthenticatedLetterClaimIdRouteImport.update({
+    id: '/letter/$claimId',
+    path: '/letter/$claimId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedWorkspaceCategoryRoute =
@@ -66,7 +86,10 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/analysis/$claimId': typeof AuthenticatedAnalysisClaimIdRoute
+  '/letter/$claimId': typeof AuthenticatedLetterClaimIdRoute
   '/workspace/$category': typeof AuthenticatedWorkspaceCategoryRoute
 }
 export interface FileRoutesByTo {
@@ -75,7 +98,10 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/analysis/$claimId': typeof AuthenticatedAnalysisClaimIdRoute
+  '/letter/$claimId': typeof AuthenticatedLetterClaimIdRoute
   '/workspace/$category': typeof AuthenticatedWorkspaceCategoryRoute
 }
 export interface FileRoutesById {
@@ -86,7 +112,10 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/analysis/$claimId': typeof AuthenticatedAnalysisClaimIdRoute
+  '/_authenticated/letter/$claimId': typeof AuthenticatedLetterClaimIdRoute
   '/_authenticated/workspace/$category': typeof AuthenticatedWorkspaceCategoryRoute
 }
 export interface FileRouteTypes {
@@ -97,7 +126,10 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/dashboard'
+    | '/history'
+    | '/notifications'
     | '/analysis/$claimId'
+    | '/letter/$claimId'
     | '/workspace/$category'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -106,7 +138,10 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/dashboard'
+    | '/history'
+    | '/notifications'
     | '/analysis/$claimId'
+    | '/letter/$claimId'
     | '/workspace/$category'
   id:
     | '__root__'
@@ -116,7 +151,10 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/_authenticated/dashboard'
+    | '/_authenticated/history'
+    | '/_authenticated/notifications'
     | '/_authenticated/analysis/$claimId'
+    | '/_authenticated/letter/$claimId'
     | '/_authenticated/workspace/$category'
   fileRoutesById: FileRoutesById
 }
@@ -172,11 +210,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/history': {
+      id: '/_authenticated/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/analysis/$claimId': {
       id: '/_authenticated/analysis/$claimId'
       path: '/analysis/$claimId'
       fullPath: '/analysis/$claimId'
       preLoaderRoute: typeof AuthenticatedAnalysisClaimIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/letter/$claimId': {
+      id: '/_authenticated/letter/$claimId'
+      path: '/letter/$claimId'
+      fullPath: '/letter/$claimId'
+      preLoaderRoute: typeof AuthenticatedLetterClaimIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/workspace/$category': {
@@ -191,13 +250,19 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedAnalysisClaimIdRoute: typeof AuthenticatedAnalysisClaimIdRoute
+  AuthenticatedLetterClaimIdRoute: typeof AuthenticatedLetterClaimIdRoute
   AuthenticatedWorkspaceCategoryRoute: typeof AuthenticatedWorkspaceCategoryRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedAnalysisClaimIdRoute: AuthenticatedAnalysisClaimIdRoute,
+  AuthenticatedLetterClaimIdRoute: AuthenticatedLetterClaimIdRoute,
   AuthenticatedWorkspaceCategoryRoute: AuthenticatedWorkspaceCategoryRoute,
 }
 
