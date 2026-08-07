@@ -1,18 +1,32 @@
 import type { DocumentTextExtractor, ExtractedText } from "./types";
 
-/**
- * Placeholder PDF text extraction adapter.
- * Replace with pdf.js / a server-side parser later; the contract is unchanged.
- */
+/** Real PDF text extraction using pdf.js in the browser. */
 export const pdfService: DocumentTextExtractor = {
-  name: "placeholder-pdf-parser",
+  name: "pdfjs",
   async extract(file: File): Promise<ExtractedText> {
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    const pdfjs = await import("pdfjs-dist");
+    pdfjs.GlobalWorkerOptions.workerSrc = (
+      await import("pdfjs-dist/build/pdf.worker.min.mjs?url")
+    ).default;
+
+    const buffer = await file.arrayBuffer();
+    const doc = await pdfjs.getDocument({ data: new Uint8Array(buffer) }).promise;
+    const parts: string[] = [];
+    for (let page = 1; page <= doc.numPages; page += 1) {
+      const content = await (await doc.getPage(page)).getTextContent();
+      const text = content.items
+        .map((item) => ("str" in item ? item.str : ""))
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (text) parts.push(`[Page ${page}]\n${text}`);
+    }
+    const text = parts.join("\n\n");
     return {
       source: file.name,
-      text: `[Placeholder PDF text for ${file.name}. Connect a PDF parser to read real contract text.]`,
-      pages: 1,
-      confidence: 0.0,
+      text: text || `[No selectable text found in ${file.name} — it may be a scanned document.]`,
+      pages: doc.numPages,
+      confidence: text ? 1 : 0,
     };
   },
 };
