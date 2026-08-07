@@ -1,5 +1,5 @@
 export * from "./types";
-export { getAnalysisEngine, placeholderEngine } from "./ai.service";
+export { getAnalysisEngine, openAiEngine } from "./ai.service";
 export { ocrService } from "./ocr.service";
 export { pdfService, pickExtractor } from "./pdf.service";
 export { docxService } from "./docx.service";
