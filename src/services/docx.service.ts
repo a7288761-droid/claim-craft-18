@@ -1,18 +1,18 @@
 import type { DocumentTextExtractor, ExtractedText } from "./types";
 
-/**
- * Placeholder Word document text extraction adapter.
- * Replace with mammoth/docx parsing later; the contract is unchanged.
- */
+/** Real Word (.docx) text extraction using mammoth in the browser. */
 export const docxService: DocumentTextExtractor = {
-  name: "placeholder-docx-parser",
+  name: "mammoth",
   async extract(file: File): Promise<ExtractedText> {
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    const mammoth = await import("mammoth/mammoth.browser.js");
+    const buffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+    const text = (result.value ?? "").replace(/\n{3,}/g, "\n\n").trim();
     return {
       source: file.name,
-      text: `[Placeholder Word document text for ${file.name}. Connect a document parser to read the real contents.]`,
+      text: text || `[No readable text found in ${file.name}.]`,
       pages: 1,
-      confidence: 0,
+      confidence: text ? 1 : 0,
     };
   },
 };
