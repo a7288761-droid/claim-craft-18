@@ -23,11 +23,13 @@ export type Database = {
           id: string
           important_dates: Json
           key_clauses: Json
+          key_entities: Json | null
           missing_information: Json
           next_steps: Json
           rejection_reasons: Json
           summary: string | null
           user_id: string
+          user_rights: Json | null
         }
         Insert: {
           claim_id: string
@@ -37,11 +39,13 @@ export type Database = {
           id?: string
           important_dates?: Json
           key_clauses?: Json
+          key_entities?: Json | null
           missing_information?: Json
           next_steps?: Json
           rejection_reasons?: Json
           summary?: string | null
           user_id: string
+          user_rights?: Json | null
         }
         Update: {
           claim_id?: string
@@ -51,11 +55,13 @@ export type Database = {
           id?: string
           important_dates?: Json
           key_clauses?: Json
+          key_entities?: Json | null
           missing_information?: Json
           next_steps?: Json
           rejection_reasons?: Json
           summary?: string | null
           user_id?: string
+          user_rights?: Json | null
         }
         Relationships: [
           {
