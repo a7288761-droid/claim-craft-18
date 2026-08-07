@@ -63,6 +63,7 @@ function LetterPage() {
         summary: analysis.data?.summary ?? "",
         keyClauses: asSections(analysis.data?.key_clauses),
         rejectionReasons: asSections(analysis.data?.rejection_reasons),
+        missingInformation: asSections(analysis.data?.missing_information),
         importantDates: asSections(analysis.data?.important_dates),
         financialAmounts: asSections(analysis.data?.financial_amounts),
         nextSteps: asSections(analysis.data?.next_steps),
@@ -115,13 +116,27 @@ function LetterPage() {
   }
 
   function handleDownload() {
-    const blob = new Blob([data!.body], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = "easyclaim-appeal-letter.txt";
-    anchor.click();
-    URL.revokeObjectURL(url);
+    void (async () => {
+      const { jsPDF } = await import("jspdf");
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
+      const margin = 56;
+      const width = doc.internal.pageSize.getWidth() - margin * 2;
+      const height = doc.internal.pageSize.getHeight();
+      doc.setFont("times", "normal");
+      doc.setFontSize(11);
+      const lines = doc.splitTextToSize(data!.body, width) as string[];
+      let y = margin;
+      for (const line of lines) {
+        if (y > height - margin) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.text(line, margin, y);
+        y += 16;
+      }
+      doc.save("easyclaim-appeal-letter.pdf");
+      toast.success("Letter downloaded as PDF");
+    })();
   }
 
   return (
@@ -144,7 +159,7 @@ function LetterPage() {
                 {copied ? <Check className="size-4" /> : <Copy className="size-4" />} Copy
               </Button>
               <Button variant="outline" onClick={handleDownload}>
-                <Download className="size-4" /> Download
+                <Download className="size-4" /> Download PDF
               </Button>
               <Button onClick={() => window.print()}>
                 <Printer className="size-4" /> Print

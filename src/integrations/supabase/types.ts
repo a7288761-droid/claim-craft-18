@@ -23,6 +23,7 @@ export type Database = {
           id: string
           important_dates: Json
           key_clauses: Json
+          missing_information: Json
           next_steps: Json
           rejection_reasons: Json
           summary: string | null
@@ -36,6 +37,7 @@ export type Database = {
           id?: string
           important_dates?: Json
           key_clauses?: Json
+          missing_information?: Json
           next_steps?: Json
           rejection_reasons?: Json
           summary?: string | null
@@ -49,6 +51,7 @@ export type Database = {
           id?: string
           important_dates?: Json
           key_clauses?: Json
+          missing_information?: Json
           next_steps?: Json
           rejection_reasons?: Json
           summary?: string | null
@@ -101,6 +104,7 @@ export type Database = {
         Row: {
           claim_id: string | null
           created_at: string
+          extracted_text: string | null
           file_name: string
           file_size: number
           file_type: string
@@ -112,6 +116,7 @@ export type Database = {
         Insert: {
           claim_id?: string | null
           created_at?: string
+          extracted_text?: string | null
           file_name: string
           file_size?: number
           file_type: string
@@ -123,6 +128,7 @@ export type Database = {
         Update: {
           claim_id?: string | null
           created_at?: string
+          extracted_text?: string | null
           file_name?: string
           file_size?: number
           file_type?: string

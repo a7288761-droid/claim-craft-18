@@ -14,6 +14,7 @@ export type AnalysisPayload = {
   summary: string;
   keyClauses: AnalysisSection[];
   rejectionReasons: AnalysisSection[];
+  missingInformation: AnalysisSection[];
   importantDates: AnalysisSection[];
   financialAmounts: AnalysisSection[];
   nextSteps: AnalysisSection[];
@@ -25,6 +26,7 @@ export type AnalysisRequest = {
   categoryName: string;
   fileNames: string[];
   notes?: string;
+  extractedText?: string;
 };
 
 export type LetterRequest = AnalysisRequest & {

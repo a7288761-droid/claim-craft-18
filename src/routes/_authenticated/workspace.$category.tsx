@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { getAnalysisEngine, storageService } from "@/services";
+import { getAnalysisEngine, storageService, extractionService } from "@/services";
+import { AnalysisProgress, ANALYSIS_STEPS } from "@/components/analysis-progress";
 
 export const Route = createFileRoute("/_authenticated/workspace/$category")({
   head: () => ({
@@ -33,6 +34,7 @@ function WorkspacePage() {
   const [files, setFiles] = useState<PendingFile[]>([]);
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
+  const [step, setStep] = useState(0);
 
   if (!category) {
     return (
@@ -57,6 +59,7 @@ function WorkspacePage() {
       return;
     }
     setBusy(true);
+    setStep(0);
     try {
       const { data: auth } = await supabase.auth.getUser();
       const userId = auth.user!.id;
@@ -74,12 +77,16 @@ function WorkspacePage() {
         .single();
       if (claimError) throw claimError;
 
+      const extracts: string[] = [];
       for (const item of valid) {
         const path = await storageService.upload(userId, item.file, (percent) =>
           setFiles((current) =>
             current.map((entry) => (entry.id === item.id ? { ...entry, progress: percent } : entry)),
           ),
         );
+        setStep(1);
+        const extracted = await extractionService.extract(item.file);
+        extracts.push(`--- ${item.file.name} ---\n${extracted.text}`);
         const { error: docError } = await supabase.from("documents").insert({
           user_id: userId,
           claim_id: claim.id,
@@ -87,17 +94,21 @@ function WorkspacePage() {
           file_type: item.file.type || "application/octet-stream",
           file_size: item.file.size,
           storage_path: path,
-          status: "uploaded",
+          status: "extracted",
+          extracted_text: extracted.text,
         });
         if (docError) throw docError;
       }
+      setStep(2);
 
       const analysis = await getAnalysisEngine().analyze({
         category: category.slug,
         categoryName: category.name,
         fileNames: valid.map((item) => item.file.name),
         notes,
+        extractedText: extracts.join("\n\n"),
       });
+      setStep(3);
 
       const { error: analysisError } = await supabase.from("analysis_results").insert({
         user_id: userId,
@@ -105,12 +116,14 @@ function WorkspacePage() {
         summary: analysis.summary,
         key_clauses: analysis.keyClauses,
         rejection_reasons: analysis.rejectionReasons,
+        missing_information: analysis.missingInformation,
         important_dates: analysis.importantDates,
         financial_amounts: analysis.financialAmounts,
         next_steps: analysis.nextSteps,
         engine: analysis.engine,
       });
       if (analysisError) throw analysisError;
+      setStep(ANALYSIS_STEPS.length);
 
       await supabase.from("claims").update({ status: "analysed" }).eq("id", claim.id);
       await supabase.from("notifications").insert({
@@ -143,6 +156,8 @@ function WorkspacePage() {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="space-y-6">
           <FileUploader files={files} onChange={setFiles} disabled={busy} />
+
+          {busy ? <AnalysisProgress activeIndex={step} /> : null}
 
           <div className="surface-card space-y-2 p-5">
             <Label htmlFor="notes">Describe what happened (optional)</Label>

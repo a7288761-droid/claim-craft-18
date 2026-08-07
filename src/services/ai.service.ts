@@ -26,6 +26,12 @@ export const placeholderEngine: AnalysisEngine = {
         { label: "Missing evidence", value: "Supporting receipts or reports may be considered incomplete." },
         { label: "Excluded cause", value: "The provider may classify the event under an exclusion clause." },
       ],
+      missingInformation: [
+        { label: "Proof of notification", value: "A dated email, letter or reference number showing when you first reported the incident." },
+        { label: "Itemised costs", value: "Original invoices or receipts that add up to the exact amount you are claiming." },
+        { label: "Official report", value: "A police, medical or provider report describing the incident independently." },
+        { label: "Full policy wording", value: "The complete terms document, not only the summary schedule." },
+      ],
       importantDates: [
         { label: "Incident date", value: "Identified in the uploaded documents" },
         { label: "Reported to provider", value: "Identified in the uploaded documents" },
