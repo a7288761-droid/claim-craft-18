@@ -1,0 +1,1 @@
+ALTER TABLE public.analysis_results ADD COLUMN IF NOT EXISTS user_rights jsonb DEFAULT '[]'::jsonb, ADD COLUMN IF NOT EXISTS key_entities jsonb DEFAULT '[]'::jsonb;

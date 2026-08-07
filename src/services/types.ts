@@ -15,6 +15,8 @@ export type AnalysisPayload = {
   keyClauses: AnalysisSection[];
   rejectionReasons: AnalysisSection[];
   missingInformation: AnalysisSection[];
+  userRights: AnalysisSection[];
+  keyEntities: AnalysisSection[];
   importantDates: AnalysisSection[];
   financialAmounts: AnalysisSection[];
   nextSteps: AnalysisSection[];

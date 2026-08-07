@@ -37,7 +37,7 @@ function LetterPage() {
   const { data, isPending } = useQuery({
     queryKey: ["letter", claimId],
     queryFn: async () => {
-      const [claim, existing, analysis] = await Promise.all([
+      const [claim, existing, analysis, docs] = await Promise.all([
         supabase.from("claims").select("*").eq("id", claimId).maybeSingle(),
         supabase
           .from("generated_letters")
@@ -53,6 +53,7 @@ function LetterPage() {
           .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle(),
+        supabase.from("documents").select("extracted_text").eq("claim_id", claimId),
       ]);
 
       if (!claim.data) return null;
@@ -64,16 +65,19 @@ function LetterPage() {
         keyClauses: asSections(analysis.data?.key_clauses),
         rejectionReasons: asSections(analysis.data?.rejection_reasons),
         missingInformation: asSections(analysis.data?.missing_information),
+        userRights: asSections(analysis.data?.user_rights),
+        keyEntities: asSections(analysis.data?.key_entities),
         importantDates: asSections(analysis.data?.important_dates),
         financialAmounts: asSections(analysis.data?.financial_amounts),
         nextSteps: asSections(analysis.data?.next_steps),
-        engine: analysis.data?.engine ?? "placeholder",
+        engine: analysis.data?.engine ?? "openai",
       };
 
       const body = await getAnalysisEngine().draftLetter({
         category: claim.data.category,
         categoryName: category?.name ?? claim.data.category,
         fileNames: [],
+        extractedText: docs.data?.map((d) => d.extracted_text ?? "").join("\n\n") ?? "",
         analysis: payload,
       });
 
