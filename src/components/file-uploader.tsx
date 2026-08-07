@@ -12,7 +12,16 @@ export type PendingFile = {
   error?: string | undefined;
 };
 
-const ACCEPTED = ["image/png", "image/jpeg", "image/webp", "image/heic", "application/pdf"];
+const ACCEPTED = [
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/heic",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+const ACCEPTED_EXTENSIONS = [".pdf", ".doc", ".docx"];
 const MAX_SIZE = 20 * 1024 * 1024;
 
 export function formatBytes(bytes: number) {
@@ -37,8 +46,9 @@ export function FileUploader({
     if (!list) return;
     const next: PendingFile[] = [];
     for (const file of Array.from(list)) {
+      const lower = file.name.toLowerCase();
       const invalid =
-        !ACCEPTED.includes(file.type) && !file.name.toLowerCase().endsWith(".pdf")
+        !ACCEPTED.includes(file.type) && !ACCEPTED_EXTENSIONS.some((ext) => lower.endsWith(ext))
           ? "Unsupported file type"
           : file.size > MAX_SIZE
             ? "File is larger than 20 MB"
@@ -81,7 +91,7 @@ export function FileUploader({
             Drag & drop your documents here
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Images and PDF files, up to 20 MB each
+            Images, PDF and Word documents, up to 20 MB each
           </p>
         </div>
         <Button type="button" variant="outline" onClick={() => inputRef.current?.click()}>
@@ -91,7 +101,7 @@ export function FileUploader({
           ref={inputRef}
           type="file"
           multiple
-          accept="image/*,application/pdf"
+          accept="image/*,application/pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           className="hidden"
           onChange={(event) => {
             addFiles(event.target.files);
