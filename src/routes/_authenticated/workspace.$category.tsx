@@ -117,6 +117,8 @@ function WorkspacePage() {
         key_clauses: analysis.keyClauses,
         rejection_reasons: analysis.rejectionReasons,
         missing_information: analysis.missingInformation,
+        user_rights: analysis.userRights,
+        key_entities: analysis.keyEntities,
         important_dates: analysis.importantDates,
         financial_amounts: analysis.financialAmounts,
         next_steps: analysis.nextSteps,
@@ -136,7 +138,11 @@ function WorkspacePage() {
       navigate({ to: "/analysis/$claimId", params: { claimId: claim.id } });
     } catch (error) {
       console.error(error);
-      toast.error("We couldn't complete the analysis. Please try again.");
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : "We couldn't complete the analysis. Please try again.";
+      toast.error(message);
     } finally {
       setBusy(false);
     }
