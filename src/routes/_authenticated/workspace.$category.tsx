@@ -84,6 +84,7 @@ function WorkspacePage() {
             current.map((entry) => (entry.id === item.id ? { ...entry, progress: percent } : entry)),
           ),
         );
+        setStep(1);
         const extracted = await extractionService.extract(item.file);
         extracts.push(`--- ${item.file.name} ---\n${extracted.text}`);
         const { error: docError } = await supabase.from("documents").insert({

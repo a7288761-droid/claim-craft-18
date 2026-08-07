@@ -8,6 +8,7 @@ import {
   FileSearch,
   FileText,
   ListChecks,
+  HelpCircle,
   ScrollText,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -139,6 +140,11 @@ function AnalysisPage() {
           icon={AlertTriangle}
           title="Possible reasons for rejection"
           items={asSections(analysis.rejection_reasons)}
+        />
+        <AnalysisSectionCard
+          icon={HelpCircle}
+          title="Missing information"
+          items={asSections(analysis.missing_information)}
         />
         <AnalysisSectionCard
           icon={CalendarDays}
