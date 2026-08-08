@@ -3,6 +3,7 @@ import { FileText, ImageIcon, Trash2, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/language-provider";
 
 export type PendingFile = {
   id: string;
@@ -39,6 +40,7 @@ export function FileUploader({
   onChange: (next: PendingFile[]) => void;
   disabled?: boolean;
 }) {
+  const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
 
@@ -49,9 +51,9 @@ export function FileUploader({
       const lower = file.name.toLowerCase();
       const invalid =
         !ACCEPTED.includes(file.type) && !ACCEPTED_EXTENSIONS.some((ext) => lower.endsWith(ext))
-          ? "Unsupported file type"
+          ? t("uploader.unsupported")
           : file.size > MAX_SIZE
-            ? "File is larger than 20 MB"
+            ? t("uploader.tooLarge")
             : undefined;
       next.push({
         id: crypto.randomUUID(),
@@ -88,14 +90,14 @@ export function FileUploader({
         </div>
         <div>
           <p className="text-sm font-medium text-foreground">
-            Drag & drop your documents here
+            {t("uploader.dropTitle")}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Images, PDF and Word documents, up to 20 MB each
+            {t("uploader.dropHint")}
           </p>
         </div>
         <Button type="button" variant="outline" onClick={() => inputRef.current?.click()}>
-          Choose files
+          {t("uploader.chooseFiles")}
         </Button>
         <input
           ref={inputRef}
@@ -117,7 +119,7 @@ export function FileUploader({
               {item.previewUrl ? (
                 <img
                   src={item.previewUrl}
-                  alt={`Preview of ${item.file.name}`}
+                  alt={t("uploader.previewOf", { name: item.file.name })}
                   className="size-12 shrink-0 rounded-lg object-cover"
                 />
               ) : (
@@ -142,7 +144,7 @@ export function FileUploader({
                 type="button"
                 variant="ghost"
                 size="icon"
-                aria-label={`Remove ${item.file.name}`}
+                aria-label={t("uploader.remove", { name: item.file.name })}
                 onClick={() => onChange(files.filter((entry) => entry.id !== item.id))}
               >
                 <Trash2 className="size-4" />
