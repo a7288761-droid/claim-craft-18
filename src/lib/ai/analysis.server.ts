@@ -71,7 +71,16 @@ Rules:
 - importantDates: incident, notification, decision and deadline dates found in the documents.
 - financialAmounts: claimed, paid, deducted and outstanding amounts with currency.
 - nextSteps: numbered, actionable steps.
-Write in the same language as the document when it is not English. Keep each value under 400 characters.`;
+Keep each value under 400 characters.`;
+
+const LANGUAGE_NAMES: Record<string, string> = { ar: "Arabic", en: "English" };
+
+function languageDirective(code?: string) {
+  const name = LANGUAGE_NAMES[code ?? ""] ?? "";
+  return name
+    ? `Write the entire output in ${name}, regardless of the language of the source documents. Keep names, policy numbers and amounts exactly as written in the documents.`
+    : "Write in the same language as the document when it is not English.";
+}
 
 const LETTER_INSTRUCTIONS = `You are a professional claims correspondence writer.
 Write a formal, polite and persuasive appeal letter based only on the supplied document text and analysis.
@@ -101,6 +110,7 @@ export async function runAnalysis(input: {
   fileNames: string[];
   notes?: string;
   extractedText: string;
+  language?: string;
 }): Promise<AnalysisResult> {
   const prompt = [
     `Claim category: ${input.categoryName}`,
@@ -114,7 +124,7 @@ export async function runAnalysis(input: {
     .join("\n");
 
   const raw = await callAi({
-    instructions: ANALYST_INSTRUCTIONS,
+    instructions: `${ANALYST_INSTRUCTIONS}\n${languageDirective(input.language)}`,
     content: [{ type: "input_text", text: prompt }],
     schema: ANALYSIS_SCHEMA,
   });
@@ -145,6 +155,7 @@ export async function runLetter(input: {
   analysisJson: string;
   recipient?: string;
   senderName?: string;
+  language?: string;
 }): Promise<string> {
   const prompt = [
     `Claim category: ${input.categoryName}`,
@@ -162,7 +173,7 @@ export async function runLetter(input: {
     .join("\n");
 
   return callAi({
-    instructions: LETTER_INSTRUCTIONS,
+    instructions: `${LETTER_INSTRUCTIONS}\n${languageDirective(input.language)}`,
     content: [{ type: "input_text", text: prompt }],
   });
 }
