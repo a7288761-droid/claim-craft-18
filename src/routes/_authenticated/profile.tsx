@@ -10,6 +10,7 @@ import { Spinner } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/i18n/language-provider";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
 
 function ProfilePage() {
   const queryClient = useQueryClient();
+  const { t } = useI18n();
   const [fullName, setFullName] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -51,7 +53,7 @@ function ProfilePage() {
     event.preventDefault();
     const parsed = z.string().trim().min(2).max(100).safeParse(fullName);
     if (!parsed.success) {
-      toast.error("Enter a name between 2 and 100 characters");
+      toast.error(t("profile.invalidName"));
       return;
     }
     setSaving(true);
@@ -65,14 +67,14 @@ function ProfilePage() {
       return;
     }
     queryClient.invalidateQueries({ queryKey: ["profile"] });
-    toast.success("Profile updated");
+    toast.success(t("profile.updated"));
   }
 
   const initials = (fullName || data?.user.email || "?").slice(0, 2).toUpperCase();
 
   return (
     <div className="space-y-8">
-      <PageHeader title="Profile" description="Your personal details used in generated letters." />
+      <PageHeader title={t("profile.title")} description={t("profile.description")} />
 
       <div className="surface-card flex items-center gap-4 p-6">
         <div className="grid size-16 shrink-0 place-items-center rounded-2xl gradient-primary text-xl font-semibold text-primary-foreground">
@@ -80,7 +82,7 @@ function ProfilePage() {
         </div>
         <div className="min-w-0">
           <p className="truncate text-base font-semibold text-foreground">
-            {fullName || "Unnamed user"}
+            {fullName || t("profile.unnamed")}
           </p>
           <p className="truncate text-sm text-muted-foreground">{data?.user.email}</p>
         </div>
@@ -88,7 +90,7 @@ function ProfilePage() {
 
       <form onSubmit={handleSave} className="surface-card max-w-lg space-y-4 p-6">
         <div className="space-y-2">
-          <Label htmlFor="full-name">Full name</Label>
+          <Label htmlFor="full-name">{t("common.fullName")}</Label>
           <Input
             id="full-name"
             value={fullName}
@@ -97,12 +99,12 @@ function ProfilePage() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("common.email")}</Label>
           <Input id="email" value={data?.user.email ?? ""} disabled />
         </div>
         <Button type="submit" disabled={saving}>
           {saving ? <Loader2 className="size-4 animate-spin" /> : <UserRound className="size-4" />}
-          Save changes
+          {t("common.save")}
         </Button>
       </form>
     </div>
