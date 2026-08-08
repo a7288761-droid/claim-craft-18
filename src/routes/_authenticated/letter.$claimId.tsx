@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { getAnalysisEngine } from "@/services";
 import { getCategory } from "@/lib/categories";
 import type { AnalysisPayload, AnalysisSection } from "@/services/types";
+import { useI18n } from "@/i18n/language-provider";
 
 export const Route = createFileRoute("/_authenticated/letter/$claimId")({
   head: () => ({
@@ -32,10 +33,11 @@ function asSections(value: unknown): AnalysisSection[] {
 
 function LetterPage() {
   const { claimId } = Route.useParams();
+  const { t, language } = useI18n();
   const [copied, setCopied] = useState(false);
 
   const { data, isPending } = useQuery({
-    queryKey: ["letter", claimId],
+    queryKey: ["letter", claimId, language],
     queryFn: async () => {
       const [claim, existing, analysis, docs] = await Promise.all([
         supabase.from("claims").select("*").eq("id", claimId).maybeSingle(),
@@ -79,6 +81,7 @@ function LetterPage() {
         fileNames: [],
         extractedText: docs.data?.map((d) => d.extracted_text ?? "").join("\n\n") ?? "",
         analysis: payload,
+        language,
       });
 
       const { data: auth } = await supabase.auth.getUser();
@@ -99,15 +102,15 @@ function LetterPage() {
     return () => clearTimeout(timer);
   }, [copied]);
 
-  if (isPending) return <Spinner label="Drafting your appeal letter…" />;
+  if (isPending) return <Spinner label={t("letter.drafting")} />;
 
   if (!data) {
     return (
       <div className="surface-card p-10 text-center">
-        <h1 className="text-lg font-semibold">Letter unavailable</h1>
-        <p className="mt-2 text-sm text-muted-foreground">We couldn&apos;t find this claim.</p>
+        <h1 className="text-lg font-semibold">{t("letter.unavailable")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("letter.unavailableText")}</p>
         <Button asChild className="mt-4">
-          <Link to="/dashboard">Back to dashboard</Link>
+          <Link to="/dashboard">{t("common.backToDashboard")}</Link>
         </Button>
       </div>
     );
@@ -116,7 +119,7 @@ function LetterPage() {
   function handleCopy() {
     navigator.clipboard.writeText(data!.body);
     setCopied(true);
-    toast.success("Letter copied to clipboard");
+    toast.success(t("letter.copied"));
   }
 
   function handleDownload() {
@@ -139,7 +142,6 @@ function LetterPage() {
         y += 16;
       }
       doc.save("easyclaim-appeal-letter.pdf");
-      toast.success("Letter downloaded as PDF");
     })();
   }
 
@@ -150,23 +152,23 @@ function LetterPage() {
         params={{ claimId }}
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground print:hidden"
       >
-        <ArrowLeft className="size-4" /> Back to analysis
+        <ArrowLeft className="size-4 rtl:rotate-180" /> {t("letter.backToAnalysis")}
       </Link>
 
       <div className="print:hidden">
         <PageHeader
-          title="Appeal letter"
-          description="Review the draft, personalise the bracketed fields, then send it to the provider."
+          title={t("letter.title")}
+          description={t("letter.description")}
           action={
             <div className="flex flex-wrap gap-2">
               <Button variant="outline" onClick={handleCopy}>
-                {copied ? <Check className="size-4" /> : <Copy className="size-4" />} Copy
+                {copied ? <Check className="size-4" /> : <Copy className="size-4" />} {t("common.copy")}
               </Button>
               <Button variant="outline" onClick={handleDownload}>
-                <Download className="size-4" /> Download PDF
+                <Download className="size-4" /> {t("common.download")}
               </Button>
               <Button onClick={() => window.print()}>
-                <Printer className="size-4" /> Print
+                <Printer className="size-4" /> {t("common.print")}
               </Button>
             </div>
           }
