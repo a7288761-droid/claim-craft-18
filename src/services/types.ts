@@ -29,6 +29,8 @@ export type AnalysisRequest = {
   fileNames: string[];
   notes?: string;
   extractedText?: string;
+  /** UI language code (e.g. "ar" | "en") used for the AI output language. */
+  language?: string;
 };
 
 export type LetterRequest = AnalysisRequest & {
