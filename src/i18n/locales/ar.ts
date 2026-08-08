@@ -173,6 +173,7 @@ export const ar = {
     title: "خطاب الاعتراض",
     description: "راجع المسودة، وعدّل الحقول بين الأقواس، ثم أرسلها إلى المزوّد.",
     copied: "تم نسخ الخطاب",
+    downloaded: "تم تنزيل الخطاب بصيغة PDF",
     letterTitle: "خطاب اعتراض {{category}}",
   },
   history: {
