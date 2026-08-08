@@ -5,6 +5,7 @@ import { CLAIM_CATEGORIES } from "@/lib/categories";
 import { PageHeader } from "@/components/page-header";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useI18n } from "@/i18n/language-provider";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function DashboardPage() {
+  const { t } = useI18n();
   const { data: stats, isPending } = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
@@ -39,17 +41,14 @@ function DashboardPage() {
   });
 
   const cards = [
-    { label: "Claims started", value: stats?.claims, icon: FileStack },
-    { label: "Documents analysed", value: stats?.analyses, icon: Clock3 },
-    { label: "Letters generated", value: stats?.letters, icon: FileCheck2 },
+    { label: t("dashboard.claimsStarted"), value: stats?.claims, icon: FileStack },
+    { label: t("dashboard.documentsAnalysed"), value: stats?.analyses, icon: Clock3 },
+    { label: t("dashboard.lettersGenerated"), value: stats?.letters, icon: FileCheck2 },
   ];
 
   return (
     <div className="space-y-10">
-      <PageHeader
-        title="Your claim workspaces"
-        description="Pick the area that matches your situation, upload your documents and let EasyClaim prepare a draft."
-      />
+      <PageHeader title={t("dashboard.title")} description={t("dashboard.description")} />
 
       <div className="grid gap-4 sm:grid-cols-3">
         {cards.map((card) => (
@@ -81,11 +80,15 @@ function DashboardPage() {
             <div className="grid size-11 place-items-center rounded-xl bg-primary-soft text-primary transition-colors group-hover:gradient-primary group-hover:text-primary-foreground">
               <category.icon className="size-5" />
             </div>
-            <h2 className="mt-4 text-base font-semibold text-foreground">{category.name}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">{category.description}</p>
+            <h2 className="mt-4 text-base font-semibold text-foreground">
+              {t(`categories.${category.slug}.name`, { defaultValue: category.name })}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {t(`categories.${category.slug}.description`, { defaultValue: category.description })}
+            </p>
             <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
-              Open workspace
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              {t("dashboard.openWorkspace")}
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
             </span>
           </Link>
         ))}

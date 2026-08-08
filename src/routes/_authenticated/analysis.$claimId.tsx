@@ -21,6 +21,8 @@ import { CardsSkeleton } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { AnalysisSection } from "@/services/types";
+import { useI18n } from "@/i18n/language-provider";
+import { getCategory } from "@/lib/categories";
 
 export const Route = createFileRoute("/_authenticated/analysis/$claimId")({
   head: () => ({
@@ -44,6 +46,7 @@ function asSections(value: unknown): AnalysisSection[] {
 
 function AnalysisPage() {
   const { claimId } = Route.useParams();
+  const { t, language } = useI18n();
 
   const { data, isPending } = useQuery({
     queryKey: ["analysis", claimId],
@@ -70,7 +73,7 @@ function AnalysisPage() {
   if (isPending) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Document analysis" description="Preparing your results…" />
+        <PageHeader title={t("analysis.title")} description={t("analysis.preparing")} />
         <CardsSkeleton count={4} />
       </div>
     );
@@ -80,11 +83,11 @@ function AnalysisPage() {
     return (
       <EmptyState
         icon={FileSearch}
-        title="No analysis found"
-        description="This claim doesn't have an analysis yet. Upload your documents to generate one."
+        title={t("analysis.noneTitle")}
+        description={t("analysis.noneText")}
         action={
           <Button asChild>
-            <Link to="/dashboard">Go to dashboard</Link>
+            <Link to="/dashboard">{t("analysis.goToDashboard")}</Link>
           </Button>
         }
       />
@@ -92,6 +95,10 @@ function AnalysisPage() {
   }
 
   const { claim, analysis, documents } = data;
+  const category = getCategory(claim.category);
+  const categoryName = category
+    ? t(`categories.${category.slug}.name`, { defaultValue: category.name })
+    : claim.category;
 
   return (
     <div className="space-y-8">
@@ -99,16 +106,18 @@ function AnalysisPage() {
         to="/dashboard"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="size-4" /> Dashboard
+        <ArrowLeft className="size-4 rtl:rotate-180" /> {t("common.dashboard")}
       </Link>
 
       <PageHeader
-        title={claim.title}
-        description={`Analysed on ${new Date(analysis.created_at).toLocaleDateString()}`}
+        title={t("workspace.claimTitle", { category: categoryName })}
+        description={t("analysis.analysedOn", {
+          date: new Date(analysis.created_at).toLocaleDateString(language),
+        })}
         action={
           <Button asChild>
             <Link to="/letter/$claimId" params={{ claimId }}>
-              <FileText className="size-4" /> Generate appeal letter
+              <FileText className="size-4" /> {t("analysis.generateLetter")}
             </Link>
           </Button>
         }
@@ -129,58 +138,55 @@ function AnalysisPage() {
         <div className="lg:col-span-2">
           <AnalysisSectionCard
             icon={FileSearch}
-            title="Document summary"
+            title={t("analysis.summary")}
             body={analysis.summary ?? ""}
           />
         </div>
         <AnalysisSectionCard
           icon={ScrollText}
-          title="Key contract clauses"
+          title={t("analysis.keyClauses")}
           items={asSections(analysis.key_clauses)}
         />
         <AnalysisSectionCard
           icon={AlertTriangle}
-          title="Possible reasons for rejection"
+          title={t("analysis.rejectionReasons")}
           items={asSections(analysis.rejection_reasons)}
         />
         <AnalysisSectionCard
           icon={HelpCircle}
-          title="Missing information"
+          title={t("analysis.missingInformation")}
           items={asSections(analysis.missing_information)}
         />
         <AnalysisSectionCard
           icon={ShieldCheck}
-          title="Your rights"
+          title={t("analysis.userRights")}
           items={asSections(analysis.user_rights)}
         />
         <AnalysisSectionCard
           icon={IdCard}
-          title="Names, policy & reference numbers"
+          title={t("analysis.keyEntities")}
           items={asSections(analysis.key_entities)}
         />
         <AnalysisSectionCard
           icon={CalendarDays}
-          title="Important dates"
+          title={t("analysis.importantDates")}
           items={asSections(analysis.important_dates)}
         />
         <AnalysisSectionCard
           icon={Coins}
-          title="Important financial amounts"
+          title={t("analysis.financialAmounts")}
           items={asSections(analysis.financial_amounts)}
         />
         <div className="lg:col-span-2">
           <AnalysisSectionCard
             icon={ListChecks}
-            title="Suggested next steps"
+            title={t("analysis.nextSteps")}
             items={asSections(analysis.next_steps)}
           />
         </div>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        This analysis is generated by AI from your uploaded documents. It is general information
-        only, not legal advice, and does not guarantee compensation.
-      </p>
+      <p className="text-xs text-muted-foreground">{t("analysis.footerNote")}</p>
     </div>
   );
 }

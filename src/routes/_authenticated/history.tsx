@@ -8,6 +8,7 @@ import { RowsSkeleton } from "@/components/loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCategory } from "@/lib/categories";
+import { useI18n } from "@/i18n/language-provider";
 
 export const Route = createFileRoute("/_authenticated/history")({
   head: () => ({
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/_authenticated/history")({
 });
 
 function HistoryPage() {
+  const { t, language } = useI18n();
   const { data, isPending } = useQuery({
     queryKey: ["claims-history"],
     queryFn: async () => {
@@ -36,18 +38,18 @@ function HistoryPage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader title="History" description="Every claim you have started, newest first." />
+      <PageHeader title={t("history.title")} description={t("history.description")} />
 
       {isPending ? (
         <RowsSkeleton />
       ) : !data || data.length === 0 ? (
         <EmptyState
           icon={FileClock}
-          title="No analyses yet"
-          description="Once you upload documents in a workspace, your analyses will appear here."
+          title={t("history.emptyTitle")}
+          description={t("history.emptyText")}
           action={
             <Button asChild>
-              <Link to="/dashboard">Start a claim</Link>
+              <Link to="/dashboard">{t("history.startClaim")}</Link>
             </Button>
           }
         />
@@ -56,6 +58,9 @@ function HistoryPage() {
           {data.map((claim, index) => {
             const category = getCategory(claim.category);
             const Icon = category?.icon ?? FileClock;
+            const categoryName = category
+              ? t(`categories.${category.slug}.name`, { defaultValue: category.name })
+              : claim.category;
             return (
               <li key={claim.id} style={{ animationDelay: `${index * 30}ms` }} className="animate-rise">
                 <Link
@@ -67,15 +72,17 @@ function HistoryPage() {
                     <Icon className="size-5" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-foreground">{claim.title}</p>
+                    <p className="truncate text-sm font-semibold text-foreground">
+                      {t("workspace.claimTitle", { category: categoryName })}
+                    </p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(claim.created_at).toLocaleString()}
+                      {new Date(claim.created_at).toLocaleString(language)}
                     </p>
                   </div>
                   <Badge variant="secondary" className="hidden shrink-0 sm:inline-flex">
-                    {claim.status}
+                    {t(`status.${claim.status}`, { defaultValue: claim.status })}
                   </Badge>
-                  <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
                 </Link>
               </li>
             );

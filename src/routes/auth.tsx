@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useI18n } from "@/i18n/language-provider";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -29,22 +31,25 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const emailSchema = z.string().trim().email("Enter a valid email address").max(255);
-const passwordSchema = z.string().min(8, "Password must be at least 8 characters").max(72);
-const nameSchema = z.string().trim().min(2, "Enter your full name").max(100);
+const emailSchema = z.string().trim().email("invalidEmail").max(255);
+const passwordSchema = z.string().min(8, "invalidPassword").max(72);
+const nameSchema = z.string().trim().min(2, "invalidName").max(100);
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
   const [pendingConfirm, setPendingConfirm] = useState(false);
+
+  const fieldError = (key: string) => toast.error(t(`auth.${key}`));
 
   async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const email = emailSchema.safeParse(form.get("email"));
     const password = passwordSchema.safeParse(form.get("password"));
-    if (!email.success) { toast.error(email.error.issues[0]!.message); return; }
-    if (!password.success) { toast.error(password.error.issues[0]!.message); return; }
+    if (!email.success) { fieldError(email.error.issues[0]!.message); return; }
+    if (!password.success) { fieldError(password.error.issues[0]!.message); return; }
 
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
@@ -62,9 +67,9 @@ function AuthPage() {
     const name = nameSchema.safeParse(form.get("name"));
     const email = emailSchema.safeParse(form.get("email"));
     const password = passwordSchema.safeParse(form.get("password"));
-    if (!name.success) { toast.error(name.error.issues[0]!.message); return; }
-    if (!email.success) { toast.error(email.error.issues[0]!.message); return; }
-    if (!password.success) { toast.error(password.error.issues[0]!.message); return; }
+    if (!name.success) { fieldError(name.error.issues[0]!.message); return; }
+    if (!email.success) { fieldError(email.error.issues[0]!.message); return; }
+    if (!password.success) { fieldError(password.error.issues[0]!.message); return; }
 
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
@@ -91,7 +96,7 @@ function AuthPage() {
     });
     if (result.error) {
       setLoading(false);
-      { toast.error("Google sign-in failed. Please try again."); return; }
+      { toast.error(t("auth.googleFailed")); return; }
     }
     if (result.redirected) return;
     navigate({ to: "/dashboard" });
@@ -102,68 +107,62 @@ function AuthPage() {
       <div className="hidden flex-col justify-between gradient-primary p-12 text-primary-foreground lg:flex">
         <Link to="/" className="flex items-center gap-2.5 text-lg font-semibold">
           <ShieldCheck className="size-6" />
-          EasyClaim
+          {t("common.appName")}
         </Link>
         <div className="space-y-4">
           <h2 className="text-3xl font-semibold leading-tight">
-            Understand your documents.
+            {t("auth.sideTitleLine1")}
             <br />
-            Prepare a stronger claim.
+            {t("auth.sideTitleLine2")}
           </h2>
           <p className="max-w-sm text-sm opacity-90">
-            Upload your policy, receipt or ticket and get a clear breakdown of clauses, deadlines
-            and the next steps — plus a ready-to-send appeal letter draft.
+            {t("auth.sideText")}
           </p>
         </div>
-        <p className="text-xs opacity-75">
-          EasyClaim provides general information only. It is not legal advice and does not
-          guarantee compensation.
-        </p>
+        <p className="text-xs opacity-75">{t("auth.sideDisclaimer")}</p>
       </div>
 
       <div className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md animate-rise">
-          <div className="mb-8 lg:hidden">
+          <div className="mb-8 flex items-center justify-between gap-3">
             <Link to="/" className="flex items-center gap-2.5">
               <span className="grid size-9 place-items-center rounded-xl gradient-primary text-primary-foreground">
                 <ShieldCheck className="size-5" />
               </span>
-              <span className="text-lg font-semibold">EasyClaim</span>
+              <span className="text-lg font-semibold lg:hidden">{t("common.appName")}</span>
             </Link>
+            <LanguageSwitcher />
           </div>
 
           {pendingConfirm ? (
             <div className="surface-card space-y-3 p-8 text-center">
-              <h1 className="text-xl font-semibold">Check your inbox</h1>
-              <p className="text-sm text-muted-foreground">
-                We sent you a confirmation link. Click it to activate your account, then come back
-                and sign in.
-              </p>
+              <h1 className="text-xl font-semibold">{t("auth.checkInbox")}</h1>
+              <p className="text-sm text-muted-foreground">{t("auth.checkInboxText")}</p>
               <Button variant="outline" onClick={() => setPendingConfirm(false)}>
-                Back to sign in
+                {t("auth.backToSignIn")}
               </Button>
             </div>
           ) : (
             <Tabs defaultValue="login">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Log in</TabsTrigger>
-                <TabsTrigger value="signup">Sign up</TabsTrigger>
+                <TabsTrigger value="login">{t("common.logIn")}</TabsTrigger>
+                <TabsTrigger value="signup">{t("common.signUp")}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="login" className="mt-6">
                 <form onSubmit={handleLogin} className="surface-card space-y-4 p-6">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
+                    <Label htmlFor="login-email">{t("common.email")}</Label>
                     <Input id="login-email" name="email" type="email" autoComplete="email" required />
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="login-password">Password</Label>
+                      <Label htmlFor="login-password">{t("common.password")}</Label>
                       <Link
                         to="/forgot-password"
                         className="text-xs font-medium text-primary hover:underline"
                       >
-                        Forgot password?
+                        {t("auth.forgotPassword")}
                       </Link>
                     </div>
                     <Input
@@ -175,7 +174,7 @@ function AuthPage() {
                     />
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? <Loader2 className="size-4 animate-spin" /> : "Log in"}
+                    {loading ? <Loader2 className="size-4 animate-spin" /> : t("common.logIn")}
                   </Button>
                   <GoogleButton onClick={handleGoogle} disabled={loading} />
                 </form>
@@ -184,15 +183,15 @@ function AuthPage() {
               <TabsContent value="signup" className="mt-6">
                 <form onSubmit={handleSignUp} className="surface-card space-y-4 p-6">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-name">Full name</Label>
+                    <Label htmlFor="signup-name">{t("common.fullName")}</Label>
                     <Input id="signup-name" name="name" autoComplete="name" required />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
+                    <Label htmlFor="signup-email">{t("common.email")}</Label>
                     <Input id="signup-email" name="email" type="email" autoComplete="email" required />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
+                    <Label htmlFor="signup-password">{t("common.password")}</Label>
                     <Input
                       id="signup-password"
                       name="password"
@@ -200,10 +199,10 @@ function AuthPage() {
                       autoComplete="new-password"
                       required
                     />
-                    <p className="text-xs text-muted-foreground">At least 8 characters.</p>
+                    <p className="text-xs text-muted-foreground">{t("auth.passwordHint")}</p>
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? <Loader2 className="size-4 animate-spin" /> : "Create account"}
+                    {loading ? <Loader2 className="size-4 animate-spin" /> : t("common.createAccount")}
                   </Button>
                   <GoogleButton onClick={handleGoogle} disabled={loading} />
                 </form>
@@ -217,11 +216,12 @@ function AuthPage() {
 }
 
 function GoogleButton({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
+  const { t } = useI18n();
   return (
     <>
       <div className="flex items-center gap-3 py-1">
         <span className="h-px flex-1 bg-border" />
-        <span className="text-xs text-muted-foreground">or</span>
+        <span className="text-xs text-muted-foreground">{t("common.or")}</span>
         <span className="h-px flex-1 bg-border" />
       </div>
       <Button type="button" variant="outline" className="w-full" onClick={onClick} disabled={disabled}>
@@ -231,7 +231,7 @@ function GoogleButton({ onClick, disabled }: { onClick: () => void; disabled: bo
           <path fill="#FBBC05" d="M5.4 14.4a7.2 7.2 0 0 1 0-4.6V6.7H1.4a12 12 0 0 0 0 10.7l4-3Z" />
           <path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.4 6.7l4 3.1C6.3 6.9 8.9 4.8 12 4.8Z" />
         </svg>
-        Continue with Google
+        {t("auth.continueWithGoogle")}
       </Button>
     </>
   );

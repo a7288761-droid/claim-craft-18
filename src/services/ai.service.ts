@@ -16,6 +16,7 @@ export const openAiEngine: AnalysisEngine = {
         fileNames: request.fileNames,
         notes: request.notes ?? "",
         extractedText: request.extractedText ?? "",
+        language: request.language ?? "",
       },
     });
     return { ...result, engine: "openai" };
@@ -29,6 +30,7 @@ export const openAiEngine: AnalysisEngine = {
         analysisJson: JSON.stringify(request.analysis),
         recipient: request.recipient ?? "",
         senderName: request.senderName ?? "",
+        language: request.language ?? "",
       },
     });
     return body;

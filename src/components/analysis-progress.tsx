@@ -1,17 +1,18 @@
 import { Check, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/language-provider";
 
 export type AnalysisStep = {
   id: string;
-  label: string;
+  labelKey: string;
 };
 
 export const ANALYSIS_STEPS: AnalysisStep[] = [
-  { id: "upload", label: "Uploading your documents" },
-  { id: "extract", label: "Extracting text from each file" },
-  { id: "analyze", label: "Analysing clauses and risks" },
-  { id: "save", label: "Saving the analysis to your history" },
+  { id: "upload", labelKey: "progress.upload" },
+  { id: "extract", labelKey: "progress.extract" },
+  { id: "analyze", labelKey: "progress.analyze" },
+  { id: "save", labelKey: "progress.save" },
 ];
 
 export function AnalysisProgress({
@@ -21,12 +22,13 @@ export function AnalysisProgress({
   activeIndex: number;
   steps?: AnalysisStep[];
 }) {
+  const { t } = useI18n();
   const percent = Math.min(100, Math.round((activeIndex / steps.length) * 100));
 
   return (
     <section className="surface-card animate-rise space-y-4 p-6" aria-live="polite">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="text-sm font-semibold text-foreground">Analysing your claim</h2>
+        <h2 className="text-sm font-semibold text-foreground">{t("progress.title")}</h2>
         <span className="text-xs text-muted-foreground">{percent}%</span>
       </div>
       <Progress value={percent} className="h-2" />
@@ -53,7 +55,7 @@ export function AnalysisProgress({
                 )}
               </span>
               <span className={cn(done || active ? "text-foreground" : "text-muted-foreground")}>
-                {step.label}
+                {t(step.labelKey)}
               </span>
             </li>
           );

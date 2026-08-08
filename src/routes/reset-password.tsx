@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/i18n/language-provider";
 
 export const Route = createFileRoute("/reset-password")({
   ssr: false,
@@ -23,20 +24,21 @@ export const Route = createFileRoute("/reset-password")({
 
 function ResetPasswordPage() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const password = z.string().min(8).max(72).safeParse(form.get("password"));
-    if (!password.success) { toast.error("Password must be at least 8 characters"); return; }
-    if (password.data !== form.get("confirm")) { toast.error("Passwords do not match"); return; }
+    if (!password.success) { toast.error(t("resetPassword.tooShort")); return; }
+    if (password.data !== form.get("confirm")) { toast.error(t("resetPassword.mismatch")); return; }
 
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password: password.data });
     setLoading(false);
     if (error) { toast.error(error.message); return; }
-    toast.success("Password updated");
+    toast.success(t("resetPassword.updated"));
     navigate({ to: "/dashboard" });
   }
 
@@ -44,21 +46,19 @@ function ResetPasswordPage() {
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
       <form onSubmit={handleSubmit} className="surface-card w-full max-w-md animate-rise space-y-4 p-6">
         <div>
-          <h1 className="text-xl font-semibold">Set a new password</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Choose a password you haven&apos;t used before.
-          </p>
+          <h1 className="text-xl font-semibold">{t("resetPassword.title")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("resetPassword.subtitle")}</p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password">New password</Label>
+          <Label htmlFor="password">{t("resetPassword.newPassword")}</Label>
           <Input id="password" name="password" type="password" autoComplete="new-password" required />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirm">Confirm password</Label>
+          <Label htmlFor="confirm">{t("resetPassword.confirmPassword")}</Label>
           <Input id="confirm" name="confirm" type="password" autoComplete="new-password" required />
         </div>
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? <Loader2 className="size-4 animate-spin" /> : "Update password"}
+          {loading ? <Loader2 className="size-4 animate-spin" /> : t("resetPassword.submit")}
         </Button>
       </form>
     </div>

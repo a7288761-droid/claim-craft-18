@@ -20,6 +20,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useTheme } from "@/hooks/use-theme";
+import { useI18n } from "@/i18n/language-provider";
+import { SUPPORTED_LANGUAGES } from "@/i18n/config";
+import type { LanguageCode } from "@/i18n/config";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -33,27 +36,16 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
-const LANGUAGES = [
-  { value: "en", label: "English" },
-  { value: "ar", label: "العربية" },
-  { value: "fr", label: "Français" },
-  { value: "es", label: "Español" },
-  { value: "de", label: "Deutsch" },
-];
-
 function SettingsPage() {
   const { theme, setTheme } = useTheme();
+  const { t, language, setLanguage } = useI18n();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [language, setLanguage] = useState("en");
   const [deleting, setDeleting] = useState(false);
 
-  async function saveLanguage(next: string) {
-    setLanguage(next);
-    const { data: auth } = await supabase.auth.getUser();
-    if (!auth.user) return;
-    await supabase.from("profiles").update({ language: next }).eq("id", auth.user.id);
-    toast.success("Language preference saved");
+  function saveLanguage(next: string) {
+    setLanguage(next as LanguageCode);
+    toast.success(t("settings.languageSaved"));
   }
 
   async function saveTheme(next: "light" | "dark") {
@@ -74,11 +66,11 @@ function SettingsPage() {
       await queryClient.cancelQueries();
       queryClient.clear();
       await supabase.auth.signOut();
-      toast.success("Your data has been deleted and you've been signed out.");
+      toast.success(t("settings.deleted"));
       navigate({ to: "/", replace: true });
     } catch (error) {
       console.error(error);
-      toast.error("We couldn't delete your account. Please try again.");
+      toast.error(t("settings.deleteFailed"));
     } finally {
       setDeleting(false);
     }
@@ -86,21 +78,21 @@ function SettingsPage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader title="Settings" description="Personalise EasyClaim and manage your account." />
+      <PageHeader title={t("settings.title")} description={t("settings.description")} />
 
       <section className="surface-card max-w-lg space-y-4 p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Preferences
+          {t("settings.preferences")}
         </h2>
         <div className="space-y-2">
-          <Label htmlFor="language">Language</Label>
+          <Label htmlFor="language">{t("common.language")}</Label>
           <Select value={language} onValueChange={saveLanguage}>
             <SelectTrigger id="language">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {LANGUAGES.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
+              {SUPPORTED_LANGUAGES.map((item) => (
+                <SelectItem key={item.code} value={item.code}>
                   {item.label}
                 </SelectItem>
               ))}
@@ -108,21 +100,21 @@ function SettingsPage() {
           </Select>
         </div>
         <div className="space-y-2">
-          <Label>Theme</Label>
+          <Label>{t("common.theme")}</Label>
           <div className="flex gap-2">
             <Button
               type="button"
               variant={theme === "light" ? "default" : "outline"}
               onClick={() => saveTheme("light")}
             >
-              <Sun className="size-4" /> Light
+              <Sun className="size-4" /> {t("common.light")}
             </Button>
             <Button
               type="button"
               variant={theme === "dark" ? "default" : "outline"}
               onClick={() => saveTheme("dark")}
             >
-              <Moon className="size-4" /> Dark
+              <Moon className="size-4" /> {t("common.dark")}
             </Button>
           </div>
         </div>
@@ -130,29 +122,24 @@ function SettingsPage() {
 
       <section className="surface-card max-w-lg space-y-3 border-destructive/40 p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-destructive">
-          Danger zone
+          {t("settings.dangerZone")}
         </h2>
-        <p className="text-sm text-muted-foreground">
-          Deleting your account permanently removes your claims, documents, analyses and letters.
-        </p>
+        <p className="text-sm text-muted-foreground">{t("settings.dangerText")}</p>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" disabled={deleting}>
               {deleting ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
-              Delete account
+              {t("settings.deleteAccount")}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete your account?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This cannot be undone. All of your claims, uploaded documents, analyses and letters
-                will be removed.
-              </AlertDialogDescription>
+              <AlertDialogTitle>{t("settings.deleteTitle")}</AlertDialogTitle>
+              <AlertDialogDescription>{t("settings.deleteDescription")}</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={deleteAccount}>Yes, delete everything</AlertDialogAction>
+              <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+              <AlertDialogAction onClick={deleteAccount}>{t("settings.deleteConfirm")}</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

@@ -10,6 +10,7 @@ export const analyzeDocuments = createServerFn({ method: "POST" })
       fileNames: string[];
       notes?: string;
       extractedText: string;
+      language?: string;
     }) => input,
   )
   .handler(async ({ data }) => runAnalysis(data));
@@ -23,6 +24,7 @@ export const draftAppealLetter = createServerFn({ method: "POST" })
       analysisJson: string;
       recipient?: string;
       senderName?: string;
+      language?: string;
     }) => input,
   )
   .handler(async ({ data }) => ({ body: await runLetter(data) }));

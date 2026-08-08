@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/empty-state";
 import { RowsSkeleton } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/language-provider";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
@@ -24,6 +25,7 @@ const ICONS = { success: CircleCheck, warning: TriangleAlert, info: Info } as co
 
 function NotificationsPage() {
   const queryClient = useQueryClient();
+  const { t, language } = useI18n();
 
   const { data, isPending } = useQuery({
     queryKey: ["notifications"],
@@ -52,12 +54,12 @@ function NotificationsPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Notifications"
-        description={unread ? `${unread} unread update${unread > 1 ? "s" : ""}` : "You're all caught up."}
+        title={t("notifications.title")}
+        description={unread ? t("notifications.unread", { count: unread }) : t("notifications.caughtUp")}
         action={
           unread ? (
             <Button variant="outline" onClick={() => markAll.mutate()} disabled={markAll.isPending}>
-              <CheckCheck className="size-4" /> Mark all as read
+              <CheckCheck className="size-4" /> {t("notifications.markAll")}
             </Button>
           ) : null
         }
@@ -68,8 +70,8 @@ function NotificationsPage() {
       ) : !data || data.length === 0 ? (
         <EmptyState
           icon={BellOff}
-          title="No notifications yet"
-          description="We'll let you know when an analysis finishes or a deadline is coming up."
+          title={t("notifications.emptyTitle")}
+          description={t("notifications.emptyText")}
         />
       ) : (
         <ul className="space-y-3">
@@ -91,7 +93,7 @@ function NotificationsPage() {
                   <p className="text-sm font-semibold text-foreground">{item.title}</p>
                   <p className="mt-0.5 text-sm text-muted-foreground">{item.message}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {new Date(item.created_at).toLocaleString()}
+                    {new Date(item.created_at).toLocaleString(language)}
                   </p>
                 </div>
               </li>
