@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/i18n/language-provider";
 
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/forgot-password")({
 });
 
 function ForgotPasswordPage() {
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -31,7 +33,7 @@ function ForgotPasswordPage() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const email = z.string().trim().email().max(255).safeParse(form.get("email"));
-    if (!email.success) { toast.error("Enter a valid email address"); return; }
+    if (!email.success) { toast.error(t("auth.invalidEmail")); return; }
 
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email.data, {
@@ -49,33 +51,28 @@ function ForgotPasswordPage() {
           to="/auth"
           className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="size-4" /> Back to sign in
+          <ArrowLeft className="size-4 rtl:rotate-180" /> {t("auth.backToSignIn")}
         </Link>
         {sent ? (
           <div className="surface-card space-y-3 p-8 text-center">
             <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-primary-soft text-primary">
               <MailCheck className="size-6" />
             </div>
-            <h1 className="text-xl font-semibold">Reset link sent</h1>
-            <p className="text-sm text-muted-foreground">
-              If an account exists for that address, you will receive an email with a link to set a
-              new password.
-            </p>
+            <h1 className="text-xl font-semibold">{t("forgotPassword.sentTitle")}</h1>
+            <p className="text-sm text-muted-foreground">{t("forgotPassword.sentText")}</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="surface-card space-y-4 p-6">
             <div>
-              <h1 className="text-xl font-semibold">Forgot your password?</h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Enter your email and we&apos;ll send you a reset link.
-              </p>
+              <h1 className="text-xl font-semibold">{t("forgotPassword.title")}</h1>
+              <p className="mt-1 text-sm text-muted-foreground">{t("forgotPassword.subtitle")}</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("common.email")}</Label>
               <Input id="email" name="email" type="email" autoComplete="email" required />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <Loader2 className="size-4 animate-spin" /> : "Send reset link"}
+              {loading ? <Loader2 className="size-4 animate-spin" /> : t("forgotPassword.submit")}
             </Button>
           </form>
         )}
