@@ -10,6 +10,8 @@ export type AnalysisSection = {
   value: string;
 };
 
+export type ClaimStrengthLevel = "strong" | "moderate" | "needs_more_info";
+
 export type AnalysisPayload = {
   summary: string;
   keyClauses: AnalysisSection[];
@@ -20,6 +22,13 @@ export type AnalysisPayload = {
   importantDates: AnalysisSection[];
   financialAmounts: AnalysisSection[];
   nextSteps: AnalysisSection[];
+  /** Estimated claim strength derived only from the uploaded documents. */
+  strengthLevel: ClaimStrengthLevel;
+  strengthReasons: AnalysisSection[];
+  strengthImprovements: AnalysisSection[];
+  /** ISO date of an appeal deadline found in the documents, or "" when unknown. */
+  deadlineDate: string;
+  deadlineNote: string;
   engine: string;
 };
 
