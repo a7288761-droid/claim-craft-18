@@ -16,6 +16,9 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
 import { AnalysisSectionCard } from "@/components/analysis-section";
+import { ClaimStatusControl } from "@/components/claim-status-control";
+import { ClaimStrengthCard } from "@/components/claim-strength-card";
+import { ClaimDeadlineCard } from "@/components/claim-deadline-card";
 import { EmptyState } from "@/components/empty-state";
 import { CardsSkeleton } from "@/components/loading";
 import { Button } from "@/components/ui/button";
@@ -135,6 +138,22 @@ function AnalysisPage() {
       ) : null}
 
       <div className="grid gap-5 lg:grid-cols-2">
+        <div className="lg:col-span-2">
+          <ClaimStatusControl
+            claimId={claimId}
+            status={claim.status}
+            statusUpdatedAt={claim.status_updated_at ?? claim.updated_at}
+          />
+        </div>
+        <ClaimStrengthCard
+          level={analysis.strength_level ?? "needs_more_info"}
+          reasons={asSections(analysis.strength_reasons)}
+          improvements={asSections(analysis.strength_improvements)}
+        />
+        <ClaimDeadlineCard
+          date={analysis.deadline_date ?? claim.deadline_at}
+          note={analysis.deadline_note ?? claim.deadline_note}
+        />
         <div className="lg:col-span-2">
           <AnalysisSectionCard
             icon={FileSearch}

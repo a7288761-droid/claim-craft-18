@@ -7,6 +7,8 @@ import { EmptyState } from "@/components/empty-state";
 import { RowsSkeleton } from "@/components/loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ClaimStatusBadge } from "@/components/claim-status-badge";
+import { daysUntil } from "@/lib/claim-status";
 import { getCategory } from "@/lib/categories";
 import { useI18n } from "@/i18n/language-provider";
 
@@ -76,12 +78,23 @@ function HistoryPage() {
                       {t("workspace.claimTitle", { category: categoryName })}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(claim.created_at).toLocaleString(language)}
+                      {t("claimStatus.lastUpdated", {
+                        date: new Date(
+                          claim.status_updated_at ?? claim.updated_at ?? claim.created_at,
+                        ).toLocaleString(language),
+                      })}
                     </p>
+                    {claim.deadline_at ? (
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {(() => {
+                          const left = daysUntil(claim.deadline_at);
+                          if (left === null) return null;
+                          return left < 0 ? t("deadline.passed") : t("deadline.daysLeft", { count: left });
+                        })()}
+                      </p>
+                    ) : null}
                   </div>
-                  <Badge variant="secondary" className="hidden shrink-0 sm:inline-flex">
-                    {t(`status.${claim.status}`, { defaultValue: claim.status })}
-                  </Badge>
+                  <ClaimStatusBadge status={claim.status} className="hidden shrink-0 sm:inline-flex" />
                   <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
                 </Link>
               </li>
