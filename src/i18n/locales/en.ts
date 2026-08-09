@@ -284,7 +284,7 @@ export const en = {
       examples: ["Warranty card", "Purchase invoice", "Service report"],
     },
   },
-} as const  claimStatus: {
+  claimStatus: {
     label: "Claim status",
     updated: "Status updated",
     updateFailed: "We couldn't update the status. Please try again.",
