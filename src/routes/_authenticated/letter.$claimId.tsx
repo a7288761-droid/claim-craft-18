@@ -72,6 +72,12 @@ function LetterPage() {
         importantDates: asSections(analysis.data?.important_dates),
         financialAmounts: asSections(analysis.data?.financial_amounts),
         nextSteps: asSections(analysis.data?.next_steps),
+        strengthLevel:
+          (analysis.data?.strength_level as AnalysisPayload["strengthLevel"]) ?? "needs_more_info",
+        strengthReasons: asSections(analysis.data?.strength_reasons),
+        strengthImprovements: asSections(analysis.data?.strength_improvements),
+        deadlineDate: analysis.data?.deadline_date ?? "",
+        deadlineNote: analysis.data?.deadline_note ?? "",
         engine: analysis.data?.engine ?? "openai",
       };
 
@@ -91,6 +97,19 @@ function LetterPage() {
         title: `${category?.name ?? "Claim"} appeal letter`,
         body,
       });
+
+      if (claim.data.status !== "submitted" && claim.data.status !== "closed") {
+        await supabase.from("claims").update({ status: "appeal_drafted" }).eq("id", claimId);
+      }
+      if (auth.user) {
+        await notify({
+          userId: auth.user.id,
+          claimId,
+          type: "success",
+          title: t("notify.letterReadyTitle"),
+          message: t("notify.letterReady"),
+        });
+      }
 
       return { claim: claim.data, body };
     },
