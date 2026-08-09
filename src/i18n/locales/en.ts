@@ -331,4 +331,4 @@ export const en = {
     deadlineSoon: "{{days}} days left before the deadline on {{date}}.",
     deadlinePassed: "The deadline on {{date}} has passed.",
   },
-;
+} as const;
