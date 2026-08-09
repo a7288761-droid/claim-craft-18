@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
 import { EmptyState } from "@/components/empty-state";
 import { RowsSkeleton } from "@/components/loading";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ClaimStatusBadge } from "@/components/claim-status-badge";
 import { daysUntil } from "@/lib/claim-status";
