@@ -180,6 +180,10 @@ export async function runAnalysis(input: {
     throw new Error("The AI returned an unreadable result. Please try again.");
   }
 
+  const strength = (parsed["strength"] ?? {}) as Record<string, unknown>;
+  const deadline = (parsed["appealDeadline"] ?? {}) as Record<string, unknown>;
+  const deadlineDate = typeof deadline["date"] === "string" ? (deadline["date"] as string) : "";
+
   return {
     summary: typeof parsed["summary"] === "string" ? (parsed["summary"] as string) : "",
     keyClauses: asSections(parsed["keyClauses"]),
