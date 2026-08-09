@@ -52,7 +52,9 @@ function DashboardPage() {
   });
 
   useEffect(() => {
-    void runDeadlineReminders(t);
+    void runDeadlineReminders((key, options) =>
+      options ? String(t(key, options as never)) : String(t(key)),
+    );
   }, [t]);
 
   const cards = [
