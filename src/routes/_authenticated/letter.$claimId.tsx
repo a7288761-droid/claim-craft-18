@@ -9,6 +9,7 @@ import { Spinner } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { getAnalysisEngine } from "@/services";
 import { getCategory } from "@/lib/categories";
+import { notify } from "@/lib/claim-notifications";
 import type { AnalysisPayload, AnalysisSection } from "@/services/types";
 import { useI18n } from "@/i18n/language-provider";
 
