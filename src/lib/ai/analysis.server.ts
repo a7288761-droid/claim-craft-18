@@ -2,6 +2,8 @@ import { callAi, type ResponseContentPart } from "./gateway.server";
 
 export type Section = { label: string; value: string };
 
+export type StrengthLevel = "strong" | "moderate" | "needs_more_info";
+
 export type AnalysisResult = {
   summary: string;
   keyClauses: Section[];
@@ -12,6 +14,11 @@ export type AnalysisResult = {
   importantDates: Section[];
   financialAmounts: Section[];
   nextSteps: Section[];
+  strengthLevel: StrengthLevel;
+  strengthReasons: Section[];
+  strengthImprovements: Section[];
+  deadlineDate: string;
+  deadlineNote: string;
 };
 
 const sectionArray = {
@@ -42,6 +49,25 @@ const ANALYSIS_SCHEMA = {
       importantDates: sectionArray,
       financialAmounts: sectionArray,
       nextSteps: sectionArray,
+      strength: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          level: { type: "string", enum: ["strong", "moderate", "needs_more_info"] },
+          reasons: sectionArray,
+          improvements: sectionArray,
+        },
+        required: ["level", "reasons", "improvements"],
+      },
+      appealDeadline: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          date: { type: "string" },
+          note: { type: "string" },
+        },
+        required: ["date", "note"],
+      },
     },
     required: [
       "summary",
@@ -53,6 +79,8 @@ const ANALYSIS_SCHEMA = {
       "importantDates",
       "financialAmounts",
       "nextSteps",
+      "strength",
+      "appealDeadline",
     ],
   },
 };
@@ -71,6 +99,16 @@ Rules:
 - importantDates: incident, notification, decision and deadline dates found in the documents.
 - financialAmounts: claimed, paid, deducted and outstanding amounts with currency.
 - nextSteps: numbered, actionable steps.
+- strength: an estimated assessment of how strong this claim looks BASED ONLY on the supplied documents.
+  level is "strong" when the documents clearly support the claim, "moderate" when support exists but has gaps,
+  and "needs_more_info" when essential evidence or details are absent.
+  reasons: short factual reasons for that level, each grounded in the documents.
+  improvements: concrete things the claimant can do or provide to strengthen the claim.
+  This is an estimate, never a guarantee — never state that the claim will be accepted or paid.
+- appealDeadline: if the documents state an appeal/objection deadline date or a period (e.g. "within 30 days of the decision")
+  AND the start date is present so the deadline can be computed reliably, return date as an ISO YYYY-MM-DD string.
+  If the date is unclear, missing, or cannot be computed, return date as an empty string — never guess.
+  note: a short explanation of where the deadline comes from, or why none was found.
 Keep each value under 400 characters.`;
 
 const LANGUAGE_NAMES: Record<string, string> = { ar: "Arabic", en: "English" };
@@ -105,6 +143,12 @@ function asSections(value: unknown): Section[] {
     .map((item) => ({ label: String(item.label), value: String(item.value) }));
 }
 
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+function asLevel(value: unknown): StrengthLevel {
+  return value === "strong" || value === "moderate" ? value : "needs_more_info";
+}
+
 export async function runAnalysis(input: {
   categoryName: string;
   fileNames: string[];
@@ -136,6 +180,10 @@ export async function runAnalysis(input: {
     throw new Error("The AI returned an unreadable result. Please try again.");
   }
 
+  const strength = (parsed["strength"] ?? {}) as Record<string, unknown>;
+  const deadline = (parsed["appealDeadline"] ?? {}) as Record<string, unknown>;
+  const deadlineDate = typeof deadline["date"] === "string" ? (deadline["date"] as string) : "";
+
   return {
     summary: typeof parsed["summary"] === "string" ? (parsed["summary"] as string) : "",
     keyClauses: asSections(parsed["keyClauses"]),
@@ -146,6 +194,11 @@ export async function runAnalysis(input: {
     importantDates: asSections(parsed["importantDates"]),
     financialAmounts: asSections(parsed["financialAmounts"]),
     nextSteps: asSections(parsed["nextSteps"]),
+    strengthLevel: asLevel(strength["level"]),
+    strengthReasons: asSections(strength["reasons"]),
+    strengthImprovements: asSections(strength["improvements"]),
+    deadlineDate: ISO_DATE.test(deadlineDate) ? deadlineDate : "",
+    deadlineNote: typeof deadline["note"] === "string" ? (deadline["note"] as string) : "",
   };
 }
 

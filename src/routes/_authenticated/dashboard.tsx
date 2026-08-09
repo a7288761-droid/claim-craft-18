@@ -1,10 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, FileStack, FileCheck2, Clock3 } from "lucide-react";
+import { useEffect } from "react";
+import {
+  ArrowRight,
+  FileStack,
+  FileCheck2,
+  Clock3,
+  CircleAlert,
+  CircleCheckBig,
+} from "lucide-react";
 import { CLAIM_CATEGORIES } from "@/lib/categories";
 import { PageHeader } from "@/components/page-header";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { normalizeStatus, STATUS_BUCKETS } from "@/lib/claim-status";
+import { runDeadlineReminders } from "@/lib/claim-notifications";
 import { useI18n } from "@/i18n/language-provider";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -27,30 +37,39 @@ function DashboardPage() {
   const { data: stats, isPending } = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
-      const [claims, analyses, letters] = await Promise.all([
-        supabase.from("claims").select("id", { count: "exact", head: true }),
-        supabase.from("analysis_results").select("id", { count: "exact", head: true }),
-        supabase.from("generated_letters").select("id", { count: "exact", head: true }),
-      ]);
+      const { data: claims } = await supabase.from("claims").select("id, status");
+      const rows = claims ?? [];
+      const count = (bucket: readonly string[]) =>
+        rows.filter((row) => bucket.includes(normalizeStatus(row.status))).length;
       return {
-        claims: claims.count ?? 0,
-        analyses: analyses.count ?? 0,
-        letters: letters.count ?? 0,
+        claims: rows.length,
+        needsAction: count(STATUS_BUCKETS.needsAction),
+        waiting: count(STATUS_BUCKETS.waiting),
+        ready: count(STATUS_BUCKETS.readyToAppeal),
+        closed: count(STATUS_BUCKETS.closed),
       };
     },
   });
 
+  useEffect(() => {
+    void runDeadlineReminders((key, options) =>
+      options ? String(t(key, options as never)) : String(t(key)),
+    );
+  }, [t]);
+
   const cards = [
     { label: t("dashboard.claimsStarted"), value: stats?.claims, icon: FileStack },
-    { label: t("dashboard.documentsAnalysed"), value: stats?.analyses, icon: Clock3 },
-    { label: t("dashboard.lettersGenerated"), value: stats?.letters, icon: FileCheck2 },
+    { label: t("dashboard.needsAction"), value: stats?.needsAction, icon: CircleAlert },
+    { label: t("dashboard.waiting"), value: stats?.waiting, icon: Clock3 },
+    { label: t("dashboard.readyToAppeal"), value: stats?.ready, icon: FileCheck2 },
+    { label: t("dashboard.closed"), value: stats?.closed, icon: CircleCheckBig },
   ];
 
   return (
     <div className="space-y-10">
       <PageHeader title={t("dashboard.title")} description={t("dashboard.description")} />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {cards.map((card) => (
           <div key={card.label} className="surface-card flex items-center gap-4 p-5">
             <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">

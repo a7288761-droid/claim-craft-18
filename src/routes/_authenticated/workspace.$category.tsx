@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { getAnalysisEngine, storageService, extractionService } from "@/services";
 import { AnalysisProgress, ANALYSIS_STEPS } from "@/components/analysis-progress";
+import { notifyMany, type NotificationInput } from "@/lib/claim-notifications";
 import { useI18n } from "@/i18n/language-provider";
 
 export const Route = createFileRoute("/_authenticated/workspace/$category")({
@@ -131,22 +132,67 @@ function WorkspacePage() {
         important_dates: analysis.importantDates,
         financial_amounts: analysis.financialAmounts,
         next_steps: analysis.nextSteps,
+        strength_level: analysis.strengthLevel,
+        strength_reasons: analysis.strengthReasons,
+        strength_improvements: analysis.strengthImprovements,
+        deadline_date: analysis.deadlineDate || null,
+        deadline_note: analysis.deadlineNote || null,
         engine: analysis.engine,
       });
       if (analysisError) throw analysisError;
       setStep(ANALYSIS_STEPS.length);
 
-      await supabase.from("claims").update({ status: "analysed" }).eq("id", claim.id);
-      await supabase.from("notifications").insert({
-        user_id: userId,
-        title: t("workspace.notificationTitle"),
-        message: t("workspace.notificationMessage", { category: categoryName }),
-        type: "success",
-      });
+      const needsInfo = analysis.missingInformation.length > 0;
+      await supabase
+        .from("claims")
+        .update({
+          status: needsInfo ? "needs_info" : "ready_to_appeal",
+          deadline_at: analysis.deadlineDate || null,
+          deadline_note: analysis.deadlineNote || null,
+        })
+        .eq("id", claim.id);
+
+      const alerts: NotificationInput[] = [
+        {
+          userId,
+          claimId: claim.id,
+          type: "success",
+          title: t("workspace.notificationTitle"),
+          message: t("workspace.notificationMessage", { category: categoryName }),
+        },
+      ];
+      if (needsInfo) {
+        alerts.push({
+          userId,
+          claimId: claim.id,
+          type: "warning",
+          title: t("notify.missingInfoTitle"),
+          message: t("notify.missingInfo", { count: analysis.missingInformation.length }),
+        });
+      } else {
+        alerts.push({
+          userId,
+          claimId: claim.id,
+          type: "info",
+          title: t("notify.readyToAppealTitle"),
+          message: t("notify.readyToAppeal", { category: categoryName }),
+        });
+      }
+      if (analysis.deadlineDate) {
+        alerts.push({
+          userId,
+          claimId: claim.id,
+          type: "warning",
+          title: t("notify.deadlineFoundTitle"),
+          message: t("notify.deadlineFound", { date: analysis.deadlineDate }),
+        });
+      }
+      await notifyMany(alerts);
 
       navigate({ to: "/analysis/$claimId", params: { claimId: claim.id } });
     } catch (error) {
       console.error(error);
+      await supabase.from("claims").update({ status: "draft" }).eq("category", category.slug).eq("status", "analysing");
       const message =
         error instanceof Error && error.message
           ? error.message
