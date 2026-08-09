@@ -18,6 +18,8 @@ export type Database = {
         Row: {
           claim_id: string
           created_at: string
+          deadline_date: string | null
+          deadline_note: string | null
           engine: string
           financial_amounts: Json
           id: string
@@ -27,6 +29,9 @@ export type Database = {
           missing_information: Json
           next_steps: Json
           rejection_reasons: Json
+          strength_improvements: Json
+          strength_level: string | null
+          strength_reasons: Json
           summary: string | null
           user_id: string
           user_rights: Json | null
@@ -34,6 +39,8 @@ export type Database = {
         Insert: {
           claim_id: string
           created_at?: string
+          deadline_date?: string | null
+          deadline_note?: string | null
           engine?: string
           financial_amounts?: Json
           id?: string
@@ -43,6 +50,9 @@ export type Database = {
           missing_information?: Json
           next_steps?: Json
           rejection_reasons?: Json
+          strength_improvements?: Json
+          strength_level?: string | null
+          strength_reasons?: Json
           summary?: string | null
           user_id: string
           user_rights?: Json | null
@@ -50,6 +60,8 @@ export type Database = {
         Update: {
           claim_id?: string
           created_at?: string
+          deadline_date?: string | null
+          deadline_note?: string | null
           engine?: string
           financial_amounts?: Json
           id?: string
@@ -59,6 +71,9 @@ export type Database = {
           missing_information?: Json
           next_steps?: Json
           rejection_reasons?: Json
+          strength_improvements?: Json
+          strength_level?: string | null
+          strength_reasons?: Json
           summary?: string | null
           user_id?: string
           user_rights?: Json | null
@@ -77,9 +92,13 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          deadline_at: string | null
+          deadline_note: string | null
+          deadline_notified_at: string | null
           id: string
           notes: string | null
           status: string
+          status_updated_at: string
           title: string
           updated_at: string
           user_id: string
@@ -87,9 +106,13 @@ export type Database = {
         Insert: {
           category: string
           created_at?: string
+          deadline_at?: string | null
+          deadline_note?: string | null
+          deadline_notified_at?: string | null
           id?: string
           notes?: string | null
           status?: string
+          status_updated_at?: string
           title: string
           updated_at?: string
           user_id: string
@@ -97,9 +120,13 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string
+          deadline_at?: string | null
+          deadline_note?: string | null
+          deadline_notified_at?: string | null
           id?: string
           notes?: string | null
           status?: string
+          status_updated_at?: string
           title?: string
           updated_at?: string
           user_id?: string
@@ -190,6 +217,7 @@ export type Database = {
       }
       notifications: {
         Row: {
+          claim_id: string | null
           created_at: string
           id: string
           message: string
@@ -199,6 +227,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          claim_id?: string | null
           created_at?: string
           id?: string
           message: string
@@ -208,6 +237,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          claim_id?: string | null
           created_at?: string
           id?: string
           message?: string
@@ -216,7 +246,15 @@ export type Database = {
           type?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notifications_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
