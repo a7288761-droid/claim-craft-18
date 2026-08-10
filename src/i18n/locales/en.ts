@@ -366,6 +366,9 @@ export const en = {
     pro: { name: "Pro", tagline: "Extended usage and the deepest analysis." },
   },
   quota: {
+    exportReport: "Export report",
+    exportLocked: "Report export is available on the Basic and Pro plans.",
+    exported: "Report downloaded",
     limitReachedTitle: "You have reached your plan limit",
     analysisLimit: "You have used all {{limit}} claim analyses in your {{plan}} plan this month.",
     letterLimit: "You have used all {{limit}} appeal letters in your {{plan}} plan this month.",
