@@ -38,6 +38,7 @@ export const en = {
     notifications: "Notifications",
     profile: "Profile",
     settings: "Settings",
+    plans: "Plans",
   },
   landing: {
     badge: "AI-assisted claim preparation",

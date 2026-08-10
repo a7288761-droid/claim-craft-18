@@ -38,6 +38,7 @@ export const ar = {
     notifications: "الإشعارات",
     profile: "الملف الشخصي",
     settings: "الإعدادات",
+    plans: "الخطط",
   },
   landing: {
     badge: "إعداد المطالبات بمساعدة الذكاء الاصطناعي",
