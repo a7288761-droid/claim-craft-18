@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { CLAIM_CATEGORIES } from "@/lib/categories";
 import { PageHeader } from "@/components/page-header";
+import { UsageMeter } from "@/components/usage-meter";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { normalizeStatus, STATUS_BUCKETS } from "@/lib/claim-status";
@@ -68,6 +69,8 @@ function DashboardPage() {
   return (
     <div className="space-y-10">
       <PageHeader title={t("dashboard.title")} description={t("dashboard.description")} />
+
+      <UsageMeter />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {cards.map((card) => (
