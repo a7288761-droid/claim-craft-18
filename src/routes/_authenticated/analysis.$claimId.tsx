@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import type { AnalysisSection } from "@/services/types";
 import { useI18n } from "@/i18n/language-provider";
 import { getCategory } from "@/lib/categories";
+import { ExportReportButton } from "@/components/export-report-button";
 
 export const Route = createFileRoute("/_authenticated/analysis/$claimId")({
   head: () => ({
@@ -118,11 +119,39 @@ function AnalysisPage() {
           date: new Date(analysis.created_at).toLocaleDateString(language),
         })}
         action={
-          <Button asChild>
-            <Link to="/letter/$claimId" params={{ claimId }}>
-              <FileText className="size-4" /> {t("analysis.generateLetter")}
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <ExportReportButton
+              title={t("workspace.claimTitle", { category: categoryName })}
+              summary={analysis.summary ?? ""}
+              sections={[
+                { heading: t("analysis.keyClauses"), items: asSections(analysis.key_clauses) },
+                {
+                  heading: t("analysis.rejectionReasons"),
+                  items: asSections(analysis.rejection_reasons),
+                },
+                {
+                  heading: t("analysis.missingInformation"),
+                  items: asSections(analysis.missing_information),
+                },
+                { heading: t("analysis.userRights"), items: asSections(analysis.user_rights) },
+                { heading: t("analysis.keyEntities"), items: asSections(analysis.key_entities) },
+                {
+                  heading: t("analysis.importantDates"),
+                  items: asSections(analysis.important_dates),
+                },
+                {
+                  heading: t("analysis.financialAmounts"),
+                  items: asSections(analysis.financial_amounts),
+                },
+                { heading: t("analysis.nextSteps"), items: asSections(analysis.next_steps) },
+              ]}
+            />
+            <Button asChild>
+              <Link to="/letter/$claimId" params={{ claimId }}>
+                <FileText className="size-4" /> {t("analysis.generateLetter")}
+              </Link>
+            </Button>
+          </div>
         }
       />
 

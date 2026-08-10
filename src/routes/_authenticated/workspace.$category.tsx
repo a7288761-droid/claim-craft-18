@@ -13,6 +13,15 @@ import { getAnalysisEngine, storageService, extractionService } from "@/services
 import { AnalysisProgress, ANALYSIS_STEPS } from "@/components/analysis-progress";
 import { notifyMany, type NotificationInput } from "@/lib/claim-notifications";
 import { useI18n } from "@/i18n/language-provider";
+import { UsageMeter } from "@/components/usage-meter";
+import { QuotaLimitNotice } from "@/components/quota-limit-notice";
+import {
+  parseQuotaError,
+  remaining,
+  subscriptionQueryKey,
+  useSubscription,
+} from "@/lib/subscription";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/workspace/$category")({
   head: () => ({
@@ -34,10 +43,13 @@ function WorkspacePage() {
   const category = getCategory(slug);
   const navigate = useNavigate();
   const { t, language } = useI18n();
+  const queryClient = useQueryClient();
+  const { data: subscription } = useSubscription();
   const [files, setFiles] = useState<PendingFile[]>([]);
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState(0);
+  const [quotaBlocked, setQuotaBlocked] = useState<{ limit: number; plan: string } | null>(null);
 
   if (!category) {
     return (
@@ -52,6 +64,9 @@ function WorkspacePage() {
   }
 
   const valid = files.filter((item) => !item.error);
+  const analysesLeft = remaining(subscription, "analyses");
+  const outOfQuota =
+    quotaBlocked !== null || (subscription !== undefined && analysesLeft !== null && analysesLeft <= 0);
   const categoryName = t(`categories.${category.slug}.name`, { defaultValue: category.name });
   const categoryDescription = t(`categories.${category.slug}.description`, {
     defaultValue: category.description,
@@ -67,6 +82,7 @@ function WorkspacePage() {
       toast.error(t("workspace.needFile"));
       return;
     }
+    if (outOfQuota) return;
     setBusy(true);
     setStep(0);
     try {
@@ -188,11 +204,19 @@ function WorkspacePage() {
         });
       }
       await notifyMany(alerts);
+      await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey });
 
       navigate({ to: "/analysis/$claimId", params: { claimId: claim.id } });
     } catch (error) {
       console.error(error);
       await supabase.from("claims").update({ status: "draft" }).eq("category", category.slug).eq("status", "analysing");
+      const quota = parseQuotaError(error);
+      if (quota) {
+        setQuotaBlocked({ limit: quota.limit, plan: quota.plan });
+        await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey });
+        setBusy(false);
+        return;
+      }
       const message =
         error instanceof Error && error.message
           ? error.message
@@ -214,8 +238,17 @@ function WorkspacePage() {
 
       <PageHeader title={categoryName} description={categoryDescription} />
 
+      <UsageMeter />
+
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="space-y-6">
+          {outOfQuota ? (
+            <QuotaLimitNotice
+              kind="analysis"
+              limit={quotaBlocked?.limit ?? subscription?.limits.analyses ?? 0}
+              plan={quotaBlocked?.plan ?? subscription?.plan ?? "free"}
+            />
+          ) : null}
           <FileUploader files={files} onChange={setFiles} disabled={busy} />
 
           {busy ? <AnalysisProgress activeIndex={step} /> : null}
@@ -233,7 +266,12 @@ function WorkspacePage() {
             <p className="text-xs text-muted-foreground">{notes.length}/1000</p>
           </div>
 
-          <Button size="lg" className="w-full sm:w-auto" onClick={handleAnalyze} disabled={busy}>
+          <Button
+            size="lg"
+            className="w-full sm:w-auto"
+            onClick={handleAnalyze}
+            disabled={busy || outOfQuota}
+          >
             {busy ? (
               <>
                 <Loader2 className="size-4 animate-spin" /> {t("workspace.analysing")}

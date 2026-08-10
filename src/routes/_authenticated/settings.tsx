@@ -5,6 +5,7 @@ import { Moon, Sun, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
+import { UsageMeter } from "@/components/usage-meter";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -79,6 +80,8 @@ function SettingsPage() {
   return (
     <div className="space-y-8">
       <PageHeader title={t("settings.title")} description={t("settings.description")} />
+
+      <UsageMeter />
 
       <section className="surface-card max-w-lg space-y-4 p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">

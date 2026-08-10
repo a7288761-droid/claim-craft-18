@@ -113,6 +113,12 @@ Keep each value under 400 characters.`;
 
 const LANGUAGE_NAMES: Record<string, string> = { ar: "Arabic", en: "English" };
 
+/** Extra depth enabled for paid plans (Basic / Pro). */
+const ADVANCED_DIRECTIVE = `Advanced analysis mode: be exhaustive. Cover every clause that affects
+entitlement, exclusions and time limits; list all rejection risks with the exact clause they rely on;
+quantify every amount and date you can find; make nextSteps specific, prioritised and evidence-driven.
+Still base everything strictly on the supplied documents.`;
+
 function languageDirective(code?: string) {
   const name = LANGUAGE_NAMES[code ?? ""] ?? "";
   return name
@@ -155,6 +161,7 @@ export async function runAnalysis(input: {
   notes?: string;
   extractedText: string;
   language?: string;
+  advanced?: boolean;
 }): Promise<AnalysisResult> {
   const prompt = [
     `Claim category: ${input.categoryName}`,
@@ -168,7 +175,7 @@ export async function runAnalysis(input: {
     .join("\n");
 
   const raw = await callAi({
-    instructions: `${ANALYST_INSTRUCTIONS}\n${languageDirective(input.language)}`,
+    instructions: `${ANALYST_INSTRUCTIONS}\n${input.advanced ? ADVANCED_DIRECTIVE : ""}\n${languageDirective(input.language)}`,
     content: [{ type: "input_text", text: prompt }],
     schema: ANALYSIS_SCHEMA,
   });

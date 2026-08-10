@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   ShieldCheck,
+  CreditCard,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ const NAV = [
   { to: "/dashboard", key: "nav.dashboard", icon: LayoutGrid },
   { to: "/history", key: "nav.history", icon: History },
   { to: "/notifications", key: "nav.notifications", icon: Bell },
+  { to: "/plans", key: "nav.plans", icon: CreditCard },
   { to: "/profile", key: "nav.profile", icon: UserRound },
   { to: "/settings", key: "nav.settings", icon: Settings },
 ] as const;
