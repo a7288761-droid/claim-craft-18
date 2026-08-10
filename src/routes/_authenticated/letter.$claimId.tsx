@@ -12,6 +12,8 @@ import { getCategory } from "@/lib/categories";
 import { notify } from "@/lib/claim-notifications";
 import type { AnalysisPayload, AnalysisSection } from "@/services/types";
 import { useI18n } from "@/i18n/language-provider";
+import { QuotaLimitNotice } from "@/components/quota-limit-notice";
+import { parseQuotaError } from "@/lib/subscription";
 
 export const Route = createFileRoute("/_authenticated/letter/$claimId")({
   head: () => ({
@@ -37,8 +39,9 @@ function LetterPage() {
   const { t, language } = useI18n();
   const [copied, setCopied] = useState(false);
 
-  const { data, isPending } = useQuery({
+  const { data, isPending, error } = useQuery({
     queryKey: ["letter", claimId, language],
+    retry: false,
     queryFn: async () => {
       const [claim, existing, analysis, docs] = await Promise.all([
         supabase.from("claims").select("*").eq("id", claimId).maybeSingle(),
@@ -123,6 +126,22 @@ function LetterPage() {
   }, [copied]);
 
   if (isPending) return <Spinner label={t("letter.drafting")} />;
+
+  const quota = parseQuotaError(error);
+  if (quota) {
+    return (
+      <div className="space-y-6">
+        <Link
+          to="/analysis/$claimId"
+          params={{ claimId }}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4 rtl:rotate-180" /> {t("letter.backToAnalysis")}
+        </Link>
+        <QuotaLimitNotice kind="letter" limit={quota.limit} plan={quota.plan} />
+      </div>
+    );
+  }
 
   if (!data) {
     return (
