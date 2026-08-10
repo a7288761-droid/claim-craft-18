@@ -256,6 +256,39 @@ export type Database = {
           },
         ]
       }
+      plans: {
+        Row: {
+          advanced_analysis: boolean
+          created_at: string
+          exports: boolean
+          id: string
+          monthly_analyses: number
+          monthly_letters: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          advanced_analysis?: boolean
+          created_at?: string
+          exports?: boolean
+          id: string
+          monthly_analyses?: number
+          monthly_letters?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          advanced_analysis?: boolean
+          created_at?: string
+          exports?: boolean
+          id?: string
+          monthly_analyses?: number
+          monthly_letters?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -286,12 +319,84 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_start: string
+          plan: string
+          provider: string | null
+          provider_customer_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_start?: string
+          plan?: string
+          provider?: string | null
+          provider_customer_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_start?: string
+          plan?: string
+          provider?: string | null
+          provider_customer_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_plan_fkey"
+            columns: ["plan"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      usage_counters: {
+        Row: {
+          analyses_used: number
+          created_at: string
+          id: string
+          letters_used: number
+          period_start: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analyses_used?: number
+          created_at?: string
+          id?: string
+          letters_used?: number
+          period_start?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analyses_used?: number
+          created_at?: string
+          id?: string
+          letters_used?: number
+          period_start?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      consume_quota: { Args: { _kind: string }; Returns: Json }
+      subscription_summary: { Args: never; Returns: Json }
     }
     Enums: {
       [_ in never]: never
