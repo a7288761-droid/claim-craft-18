@@ -155,6 +155,7 @@ export async function runAnalysis(input: {
   notes?: string;
   extractedText: string;
   language?: string;
+  advanced?: boolean;
 }): Promise<AnalysisResult> {
   const prompt = [
     `Claim category: ${input.categoryName}`,
@@ -168,7 +169,7 @@ export async function runAnalysis(input: {
     .join("\n");
 
   const raw = await callAi({
-    instructions: `${ANALYST_INSTRUCTIONS}\n${languageDirective(input.language)}`,
+    instructions: `${ANALYST_INSTRUCTIONS}\n${input.advanced ? ADVANCED_DIRECTIVE : ""}\n${languageDirective(input.language)}`,
     content: [{ type: "input_text", text: prompt }],
     schema: ANALYSIS_SCHEMA,
   });
