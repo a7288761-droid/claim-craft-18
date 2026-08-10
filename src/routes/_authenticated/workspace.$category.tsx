@@ -238,6 +238,8 @@ function WorkspacePage() {
 
       <PageHeader title={categoryName} description={categoryDescription} />
 
+      <UsageMeter />
+
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="space-y-6">
           {outOfQuota ? (
