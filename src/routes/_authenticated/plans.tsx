@@ -45,8 +45,6 @@ function PlanCard({
   busy: boolean;
 }) {
   const { t } = useI18n();
-  const { data } = useSubscription();
-  const limits = current ? data?.limits : undefined;
   const highlight = plan === "basic";
 
   return (
@@ -86,7 +84,6 @@ function PlanCard({
       </ul>
 
       <div className="mt-auto">
-        {limits ? null : null}
         <Button
           className="w-full"
           variant={current ? "outline" : "default"}
