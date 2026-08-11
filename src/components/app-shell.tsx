@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/language-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { useIsAdmin } from "@/lib/use-admin";
 
 const NAV = [
   { to: "/dashboard", key: "nav.dashboard", icon: LayoutGrid },
@@ -45,6 +46,7 @@ function Brand() {
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const { t } = useI18n();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { isAdmin } = useIsAdmin();
   const { data: unread } = useQuery({
     queryKey: ["notifications", "unread"],
     queryFn: async () => {
@@ -58,7 +60,12 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <nav className="space-y-1">
-      {NAV.map((item) => {
+      {[
+        ...NAV,
+        ...(isAdmin
+          ? [{ to: "/admin", key: "nav.admin", icon: ShieldCheck } as const]
+          : []),
+      ].map((item) => {
         const active = pathname === item.to;
         return (
           <Link
