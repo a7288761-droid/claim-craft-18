@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { PLAN_IDS } from "@/lib/subscription";
 import { useI18n } from "@/i18n/language-provider";
 
-export const Route = createFileRoute("/_authenticated/admin/users")({
+export const Route = createFileRoute("/_authenticated/admin/users/")({
   head: () => ({
     meta: [
       { title: "Admin users — EasyClaim" },
