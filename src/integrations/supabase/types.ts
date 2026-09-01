@@ -10,13 +10,14 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.15"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
       analysis_results: {
         Row: {
           claim_id: string
+          contradictions: Json
           created_at: string
           deadline_date: string | null
           deadline_note: string | null
@@ -38,6 +39,7 @@ export type Database = {
         }
         Insert: {
           claim_id: string
+          contradictions?: Json
           created_at?: string
           deadline_date?: string | null
           deadline_note?: string | null
@@ -59,6 +61,7 @@ export type Database = {
         }
         Update: {
           claim_id?: string
+          contradictions?: Json
           created_at?: string
           deadline_date?: string | null
           deadline_note?: string | null
@@ -133,11 +136,50 @@ export type Database = {
         }
         Relationships: []
       }
+      document_questions: {
+        Row: {
+          answer: string
+          claim_id: string
+          created_at: string
+          id: string
+          question: string
+          sources: Json
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          claim_id: string
+          created_at?: string
+          id?: string
+          question: string
+          sources?: Json
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          claim_id?: string
+          created_at?: string
+          id?: string
+          question?: string
+          sources?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_questions_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           claim_id: string | null
           created_at: string
           extracted_text: string | null
+          facts: Json
           file_name: string
           file_size: number
           file_type: string
@@ -150,6 +192,7 @@ export type Database = {
           claim_id?: string | null
           created_at?: string
           extracted_text?: string | null
+          facts?: Json
           file_name: string
           file_size?: number
           file_type: string
@@ -162,6 +205,7 @@ export type Database = {
           claim_id?: string | null
           created_at?: string
           extracted_text?: string | null
+          facts?: Json
           file_name?: string
           file_size?: number
           file_type?: string
