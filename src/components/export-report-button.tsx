@@ -12,10 +12,17 @@ export function ExportReportButton({
   title,
   summary,
   sections,
+  fileName = "easyclaim-report.pdf",
+  label,
+  successMessage,
 }: {
   title: string;
   summary: string;
   sections: ReportSection[];
+  /** Output file name; defaults to the analysis report name. */
+  fileName?: string;
+  label?: string;
+  successMessage?: string;
 }) {
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -65,15 +72,15 @@ export function ExportReportButton({
         y += 8;
       }
       write(t("analysis.footerNote"), 9, false);
-      doc.save("easyclaim-report.pdf");
-      toast.success(t("quota.exported"));
+      doc.save(fileName);
+      toast.success(successMessage ?? t("quota.exported"));
     })();
   }
 
   return (
     <Button variant="outline" onClick={exportPdf}>
       {allowed ? <Download className="size-4" /> : <Lock className="size-4" />}
-      {t("quota.exportReport")}
+      {label ?? t("quota.exportReport")}
     </Button>
   );
 }

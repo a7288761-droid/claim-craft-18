@@ -24,7 +24,9 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminPlansRouteImport } from './routes/_authenticated/admin/plans'
 import { Route as AuthenticatedAnalysisClaimIdRouteImport } from './routes/_authenticated/analysis.$claimId'
+import { Route as AuthenticatedCompareClaimIdRouteImport } from './routes/_authenticated/compare.$claimId'
 import { Route as AuthenticatedLetterClaimIdRouteImport } from './routes/_authenticated/letter.$claimId'
+import { Route as AuthenticatedPackageClaimIdRouteImport } from './routes/_authenticated/package.$claimId'
 import { Route as AuthenticatedWorkspaceCategoryRouteImport } from './routes/_authenticated/workspace.$category'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users.index'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users.$userId'
@@ -105,10 +107,22 @@ const AuthenticatedAnalysisClaimIdRoute =
     path: '/analysis/$claimId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCompareClaimIdRoute =
+  AuthenticatedCompareClaimIdRouteImport.update({
+    id: '/compare/$claimId',
+    path: '/compare/$claimId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLetterClaimIdRoute =
   AuthenticatedLetterClaimIdRouteImport.update({
     id: '/letter/$claimId',
     path: '/letter/$claimId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPackageClaimIdRoute =
+  AuthenticatedPackageClaimIdRouteImport.update({
+    id: '/package/$claimId',
+    path: '/package/$claimId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedWorkspaceCategoryRoute =
@@ -144,7 +158,9 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/analysis/$claimId': typeof AuthenticatedAnalysisClaimIdRoute
+  '/compare/$claimId': typeof AuthenticatedCompareClaimIdRoute
   '/letter/$claimId': typeof AuthenticatedLetterClaimIdRoute
+  '/package/$claimId': typeof AuthenticatedPackageClaimIdRoute
   '/workspace/$category': typeof AuthenticatedWorkspaceCategoryRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
@@ -163,7 +179,9 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/analysis/$claimId': typeof AuthenticatedAnalysisClaimIdRoute
+  '/compare/$claimId': typeof AuthenticatedCompareClaimIdRoute
   '/letter/$claimId': typeof AuthenticatedLetterClaimIdRoute
+  '/package/$claimId': typeof AuthenticatedPackageClaimIdRoute
   '/workspace/$category': typeof AuthenticatedWorkspaceCategoryRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
@@ -185,7 +203,9 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/_authenticated/analysis/$claimId': typeof AuthenticatedAnalysisClaimIdRoute
+  '/_authenticated/compare/$claimId': typeof AuthenticatedCompareClaimIdRoute
   '/_authenticated/letter/$claimId': typeof AuthenticatedLetterClaimIdRoute
+  '/_authenticated/package/$claimId': typeof AuthenticatedPackageClaimIdRoute
   '/_authenticated/workspace/$category': typeof AuthenticatedWorkspaceCategoryRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
@@ -207,7 +227,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/admin/plans'
     | '/analysis/$claimId'
+    | '/compare/$claimId'
     | '/letter/$claimId'
+    | '/package/$claimId'
     | '/workspace/$category'
     | '/admin/'
     | '/admin/users/$userId'
@@ -226,7 +248,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/admin/plans'
     | '/analysis/$claimId'
+    | '/compare/$claimId'
     | '/letter/$claimId'
+    | '/package/$claimId'
     | '/workspace/$category'
     | '/admin'
     | '/admin/users/$userId'
@@ -247,7 +271,9 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/admin/plans'
     | '/_authenticated/analysis/$claimId'
+    | '/_authenticated/compare/$claimId'
     | '/_authenticated/letter/$claimId'
+    | '/_authenticated/package/$claimId'
     | '/_authenticated/workspace/$category'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/users/$userId'
@@ -369,11 +395,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalysisClaimIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/compare/$claimId': {
+      id: '/_authenticated/compare/$claimId'
+      path: '/compare/$claimId'
+      fullPath: '/compare/$claimId'
+      preLoaderRoute: typeof AuthenticatedCompareClaimIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/letter/$claimId': {
       id: '/_authenticated/letter/$claimId'
       path: '/letter/$claimId'
       fullPath: '/letter/$claimId'
       preLoaderRoute: typeof AuthenticatedLetterClaimIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/package/$claimId': {
+      id: '/_authenticated/package/$claimId'
+      path: '/package/$claimId'
+      fullPath: '/package/$claimId'
+      preLoaderRoute: typeof AuthenticatedPackageClaimIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/workspace/$category': {
@@ -429,7 +469,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedAnalysisClaimIdRoute: typeof AuthenticatedAnalysisClaimIdRoute
+  AuthenticatedCompareClaimIdRoute: typeof AuthenticatedCompareClaimIdRoute
   AuthenticatedLetterClaimIdRoute: typeof AuthenticatedLetterClaimIdRoute
+  AuthenticatedPackageClaimIdRoute: typeof AuthenticatedPackageClaimIdRoute
   AuthenticatedWorkspaceCategoryRoute: typeof AuthenticatedWorkspaceCategoryRoute
 }
 
@@ -442,7 +484,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedAnalysisClaimIdRoute: AuthenticatedAnalysisClaimIdRoute,
+  AuthenticatedCompareClaimIdRoute: AuthenticatedCompareClaimIdRoute,
   AuthenticatedLetterClaimIdRoute: AuthenticatedLetterClaimIdRoute,
+  AuthenticatedPackageClaimIdRoute: AuthenticatedPackageClaimIdRoute,
   AuthenticatedWorkspaceCategoryRoute: AuthenticatedWorkspaceCategoryRoute,
 }
 
