@@ -12,10 +12,17 @@ export function ExportReportButton({
   title,
   summary,
   sections,
+  fileName = "easyclaim-report.pdf",
+  label,
+  successMessage,
 }: {
   title: string;
   summary: string;
   sections: ReportSection[];
+  /** Output file name; defaults to the analysis report name. */
+  fileName?: string;
+  label?: string;
+  successMessage?: string;
 }) {
   const { t } = useI18n();
   const navigate = useNavigate();
