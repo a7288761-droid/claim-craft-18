@@ -7,7 +7,7 @@ import { useI18n } from "@/i18n/language-provider";
 import { findContradictions, type ClaimDocumentFacts } from "@/lib/document-facts";
 import { useClaimFacts } from "@/lib/use-claim-facts";
 
-type TranslateFn = (key: string, options?: { defaultValue: string }) => string;
+type TranslateFn = ReturnType<typeof useI18n>["t"];
 
 export function factLabel(t: TranslateFn, key: string, fallback: string) {
   if (key.startsWith("other:")) return fallback;
