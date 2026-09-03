@@ -151,6 +151,16 @@ function AnalysisPage() {
                 { heading: t("analysis.nextSteps"), items: asSections(analysis.next_steps) },
               ]}
             />
+            <Button variant="outline" asChild>
+              <Link to="/compare/$claimId" params={{ claimId }}>
+                <Columns3 className="size-4" /> {t("compare.title")}
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/package/$claimId" params={{ claimId }}>
+                <PackageCheck className="size-4" /> {t("packet.open")}
+              </Link>
+            </Button>
             <Button asChild>
               <Link to="/letter/$claimId" params={{ claimId }}>
                 <FileText className="size-4" /> {t("analysis.generateLetter")}
