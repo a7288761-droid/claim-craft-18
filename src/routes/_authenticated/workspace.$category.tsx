@@ -48,6 +48,7 @@ function WorkspacePage() {
   const { t, language } = useI18n();
   const queryClient = useQueryClient();
   const { data: subscription } = useSubscription();
+  const runExtractFacts = useServerFn(extractClaimFacts);
   const [files, setFiles] = useState<PendingFile[]>([]);
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
