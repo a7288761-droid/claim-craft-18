@@ -162,6 +162,17 @@ function WorkspacePage() {
       if (analysisError) throw analysisError;
       setStep(ANALYSIS_STEPS.length);
 
+      // Extract the comparable fact sheet of every uploaded document so the
+      // contradiction detector, comparison table and appeal package are ready.
+      try {
+        const facts = await runExtractFacts({ data: { claimId: claim.id, force: true } });
+        queryClient.setQueryData(claimFactsQueryKey(claim.id), facts);
+      } catch (factsError) {
+        console.error("fact extraction failed", factsError);
+      }
+
+
+
       const needsInfo = analysis.missingInformation.length > 0;
       await supabase
         .from("claims")
