@@ -247,7 +247,14 @@ function AnalysisPage() {
             items={asSections(analysis.next_steps)}
           />
         </div>
+        <div className="lg:col-span-2">
+          <ContradictionsCard claimId={claimId} documentCount={documents.length} />
+        </div>
+        <div className="lg:col-span-2">
+          <AskDocumentCard claimId={claimId} />
+        </div>
       </div>
+
 
       <p className="text-xs text-muted-foreground">{t("analysis.footerNote")}</p>
     </div>
