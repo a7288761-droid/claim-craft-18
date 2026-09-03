@@ -22,6 +22,9 @@ import {
   useSubscription,
 } from "@/lib/subscription";
 import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { extractClaimFacts } from "@/lib/documents.functions";
+import { claimFactsQueryKey } from "@/lib/use-claim-facts";
 
 export const Route = createFileRoute("/_authenticated/workspace/$category")({
   head: () => ({
@@ -45,6 +48,7 @@ function WorkspacePage() {
   const { t, language } = useI18n();
   const queryClient = useQueryClient();
   const { data: subscription } = useSubscription();
+  const runExtractFacts = useServerFn(extractClaimFacts);
   const [files, setFiles] = useState<PendingFile[]>([]);
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
@@ -157,6 +161,17 @@ function WorkspacePage() {
       });
       if (analysisError) throw analysisError;
       setStep(ANALYSIS_STEPS.length);
+
+      // Extract the comparable fact sheet of every uploaded document so the
+      // contradiction detector, comparison table and appeal package are ready.
+      try {
+        const facts = await runExtractFacts({ data: { claimId: claim.id, force: true } });
+        queryClient.setQueryData(claimFactsQueryKey(claim.id), facts);
+      } catch (factsError) {
+        console.error("fact extraction failed", factsError);
+      }
+
+
 
       const needsInfo = analysis.missingInformation.length > 0;
       await supabase

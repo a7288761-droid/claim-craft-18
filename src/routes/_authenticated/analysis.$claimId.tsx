@@ -5,11 +5,13 @@ import {
   ArrowLeft,
   CalendarDays,
   Coins,
+  Columns3,
   FileSearch,
   FileText,
   ListChecks,
   HelpCircle,
   IdCard,
+  PackageCheck,
   ShieldCheck,
   ScrollText,
 } from "lucide-react";
@@ -19,6 +21,8 @@ import { AnalysisSectionCard } from "@/components/analysis-section";
 import { ClaimStatusControl } from "@/components/claim-status-control";
 import { ClaimStrengthCard } from "@/components/claim-strength-card";
 import { ClaimDeadlineCard } from "@/components/claim-deadline-card";
+import { ContradictionsCard } from "@/components/contradictions-card";
+import { AskDocumentCard } from "@/components/ask-document-card";
 import { EmptyState } from "@/components/empty-state";
 import { CardsSkeleton } from "@/components/loading";
 import { Button } from "@/components/ui/button";
@@ -27,6 +31,7 @@ import type { AnalysisSection } from "@/services/types";
 import { useI18n } from "@/i18n/language-provider";
 import { getCategory } from "@/lib/categories";
 import { ExportReportButton } from "@/components/export-report-button";
+
 
 export const Route = createFileRoute("/_authenticated/analysis/$claimId")({
   head: () => ({
@@ -146,6 +151,16 @@ function AnalysisPage() {
                 { heading: t("analysis.nextSteps"), items: asSections(analysis.next_steps) },
               ]}
             />
+            <Button variant="outline" asChild>
+              <Link to="/compare/$claimId" params={{ claimId }}>
+                <Columns3 className="size-4" /> {t("compare.title")}
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/package/$claimId" params={{ claimId }}>
+                <PackageCheck className="size-4" /> {t("packet.open")}
+              </Link>
+            </Button>
             <Button asChild>
               <Link to="/letter/$claimId" params={{ claimId }}>
                 <FileText className="size-4" /> {t("analysis.generateLetter")}
@@ -232,7 +247,14 @@ function AnalysisPage() {
             items={asSections(analysis.next_steps)}
           />
         </div>
+        <div className="lg:col-span-2">
+          <ContradictionsCard claimId={claimId} documentCount={documents.length} />
+        </div>
+        <div className="lg:col-span-2">
+          <AskDocumentCard claimId={claimId} />
+        </div>
       </div>
+
 
       <p className="text-xs text-muted-foreground">{t("analysis.footerNote")}</p>
     </div>
