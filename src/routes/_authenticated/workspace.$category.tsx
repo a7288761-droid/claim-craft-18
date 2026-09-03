@@ -22,6 +22,9 @@ import {
   useSubscription,
 } from "@/lib/subscription";
 import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { extractClaimFacts } from "@/lib/documents.functions";
+import { claimFactsQueryKey } from "@/lib/use-claim-facts";
 
 export const Route = createFileRoute("/_authenticated/workspace/$category")({
   head: () => ({
