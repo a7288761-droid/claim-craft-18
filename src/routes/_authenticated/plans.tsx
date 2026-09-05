@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
 import { Check, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
 import { UsageMeter } from "@/components/usage-meter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/language-provider";
-import { PLAN_IDS, subscriptionQueryKey, useSubscription, type PlanId } from "@/lib/subscription";
+import { PLAN_IDS, useSubscription, type PlanId } from "@/lib/subscription";
 
 export const Route = createFileRoute("/_authenticated/plans")({
   head: () => ({
@@ -108,8 +106,7 @@ const PLAN_LIMITS: Record<PlanId, { analyses: number; letters: number }> = {
 function PlansPage() {
   const { t } = useI18n();
   const { data } = useSubscription();
-  const queryClient = useQueryClient();
-  const [pending, setPending] = useState<PlanId | null>(null);
+  const [pending] = useState<PlanId | null>(null);
 
   // Plan changes are server-side only. Clients must never write to the
   // subscriptions table directly (RLS also blocks it).
