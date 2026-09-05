@@ -111,23 +111,10 @@ function PlansPage() {
   const queryClient = useQueryClient();
   const [pending, setPending] = useState<PlanId | null>(null);
 
-  async function selectPlan(plan: PlanId) {
-    setPending(plan);
-    try {
-      const { data: auth } = await supabase.auth.getUser();
-      if (!auth.user) throw new Error("no user");
-      const { error } = await supabase
-        .from("subscriptions")
-        .upsert({ user_id: auth.user.id, plan }, { onConflict: "user_id" });
-      if (error) throw error;
-      await queryClient.invalidateQueries({ queryKey: subscriptionQueryKey });
-      toast.success(t("plans.activated", { plan: t(`plans.${plan}.name`) }));
-    } catch (error) {
-      console.error(error);
-      toast.error(t("plans.activateFailed"));
-    } finally {
-      setPending(null);
-    }
+  // Plan changes are server-side only. Clients must never write to the
+  // subscriptions table directly (RLS also blocks it).
+  function selectPlan(_plan: PlanId) {
+    toast.info(t("plans.noPayment"));
   }
 
   return (
