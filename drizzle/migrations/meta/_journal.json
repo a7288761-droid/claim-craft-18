@@ -8,6 +8,13 @@
       "when": 1788262442321,
       "tag": "0000_document_facts_and_qa",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788619398342,
+      "tag": "0001_lock_down_subscriptions_writes",
+      "breakpoints": true
     }
   ]
 }
