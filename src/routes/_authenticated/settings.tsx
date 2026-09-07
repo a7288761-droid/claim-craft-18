@@ -59,11 +59,7 @@ function SettingsPage() {
   async function deleteAccount() {
     setDeleting(true);
     try {
-      const { data: auth } = await supabase.auth.getUser();
-      const userId = auth.user!.id;
-      await supabase.from("claims").delete().eq("user_id", userId);
-      await supabase.from("notifications").delete().eq("user_id", userId);
-      await supabase.from("profiles").delete().eq("id", userId);
+      await runDeleteAccount({});
       await queryClient.cancelQueries();
       queryClient.clear();
       await supabase.auth.signOut();
