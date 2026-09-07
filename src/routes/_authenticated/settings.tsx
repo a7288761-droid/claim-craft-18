@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { deleteMyAccount } from "@/lib/account.functions";
 import { Moon, Sun, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +45,7 @@ function SettingsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [deleting, setDeleting] = useState(false);
+  const runDeleteAccount = useServerFn(deleteMyAccount);
 
   function saveLanguage(next: string) {
     setLanguage(next as LanguageCode);
