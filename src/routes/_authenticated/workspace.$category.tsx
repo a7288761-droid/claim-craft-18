@@ -89,9 +89,11 @@ function WorkspacePage() {
     if (outOfQuota) return;
     setBusy(true);
     setStep(0);
+    let userId: string | null = null;
+    let currentClaimId: string | null = null;
     try {
       const { data: auth } = await supabase.auth.getUser();
-      const userId = auth.user!.id;
+      userId = auth.user!.id;
 
       const { data: claim, error: claimError } = await supabase
         .from("claims")
@@ -105,6 +107,7 @@ function WorkspacePage() {
         .select()
         .single();
       if (claimError) throw claimError;
+      currentClaimId = claim.id;
 
       const extracts: string[] = [];
       for (const item of valid) {
@@ -224,7 +227,13 @@ function WorkspacePage() {
       navigate({ to: "/analysis/$claimId", params: { claimId: claim.id } });
     } catch (error) {
       console.error(error);
-      await supabase.from("claims").update({ status: "draft" }).eq("category", category.slug).eq("status", "analysing");
+      if (currentClaimId && userId) {
+        await supabase
+          .from("claims")
+          .update({ status: "draft" })
+          .eq("id", currentClaimId)
+          .eq("user_id", userId);
+      }
       const quota = parseQuotaError(error);
       if (quota) {
         setQuotaBlocked({ limit: quota.limit, plan: quota.plan });
