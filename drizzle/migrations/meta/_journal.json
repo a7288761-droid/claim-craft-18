@@ -15,6 +15,13 @@
       "when": 1788619398342,
       "tag": "0001_lock_down_subscriptions_writes",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788887083486,
+      "tag": "0002_harden_subscriptions_grants",
+      "breakpoints": true
     }
   ]
 }
